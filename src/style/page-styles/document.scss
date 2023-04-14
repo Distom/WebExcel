@@ -1,0 +1,157 @@
+.document {
+	overflow: hidden;
+	font-size: 0.8125rem;
+	/* 13/16 */
+
+	&__header {
+		height: 34px;
+		padding: 8px 0;
+		background: $light-blue;
+	}
+
+	&__main {}
+}
+
+.header-document {
+	&__container {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	&__input {
+		font-size: 1rem;
+		max-width: 50%;
+		max-height: calc(1rem + 4px);
+		padding: 2px 10px;
+		overflow: hidden;
+
+		&:hover,
+		&:focus {
+			outline: 1px solid black;
+			border-radius: 4px;
+		}
+	}
+
+	&__buttons {
+		display: flex;
+		gap: 16px;
+	}
+
+	&__button {}
+
+	&__button-icon {}
+}
+
+.main-document {
+	&__toolbar {
+		padding-bottom: 8px;
+		display: flex;
+		align-items: center;
+		background: $light-blue;
+	}
+
+	&__formula {
+		display: flex;
+		align-items: center;
+		border: 1px solid $border-color;
+		border-left: 0;
+		border-right: 0;
+	}
+
+	&__table {
+		overflow: auto;
+	}
+}
+
+.document-toolbar {
+	&__container {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		height: 34px;
+		background-color: $blue;
+		width: calc(100% - 30px);
+		border-radius: 20px;
+	}
+
+	&__buttons-block {
+		padding: 0 10px;
+
+		&:not(:last-child) {
+			border-right: 1px solid $border-color;
+		}
+	}
+}
+
+.toolbar-buttons-block {
+	&__buttons {
+		align-items: center;
+		display: flex;
+		gap: 5px;
+	}
+
+	&__button-wrapper {}
+
+	&__button {}
+
+	&__button-icon {}
+}
+
+.document-formula {
+	&__info {
+		flex: 0 0 46px;
+		text-align: center;
+		border-right: 1px solid $border-color;
+		padding: 5px 10px;
+		font-size: 1rem;
+		font-style: italic;
+		color: grey;
+	}
+
+	&__input {
+		flex: 1 1 auto;
+		padding: 3px 10px;
+	}
+}
+
+.document-table {
+	&__rows {}
+
+	&__row {
+		display: flex;
+		height: 26px;
+	}
+
+	&__row-info {
+		min-width: 46px;
+		border: 1px solid $border-color;
+		border-top: 0;
+		border-left: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(128, 128, 128, 0.1);
+	}
+
+	&__row-columns,
+	&__row-cells {
+		display: flex;
+	}
+
+	&__column,
+	&__cell {
+		height: 26px;
+		width: 100px;
+		border: 1px solid $border-color;
+		border-top: 0;
+		border-left: 0;
+		display: flex;
+		align-items: center;
+	}
+
+	&__column {
+		justify-content: center;
+		background: rgba(128, 128, 128, 0.1);
+	}
+}

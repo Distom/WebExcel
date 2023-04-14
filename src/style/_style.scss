@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap');
+
+body {
+	font-family: 'Roboto', sans-serif;
+}
+
+[class*='_container'] {
+	padding: 0 15px;
+	height: 100%;
+	width: 100%;
+	margin: 0 auto;
+	max-width: 1200px;
+}
+
+.document [class*='_container'] {
+	max-width: none;
+}
+
+@import './page-styles/document.scss';
+@import './page-styles/home.scss';
