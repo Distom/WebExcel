@@ -5,15 +5,35 @@
     "es2021": true
   },
   "parser": "@babel/eslint-parser",
-  "extends": ["airbnb-base", "prettier"],
-  "plugins": ["prettier"],
+  "plugins": [
+    "prettier"
+  ],
+  "extends": [
+    "airbnb-base",
+    "plugin:prettier/recommended",
+    "eslint-config-prettier"
+  ],
   "rules": {
     "prettier/prettier": [
       "warn",
       {
-        "endOfLine": "auto"
+        "endOfLine": "auto",
+        "printWidth": 100,
+        "singleQuote": true,
+        "trailingComma": "all",
+        "bracketSpacing": true,
+        "jsxBracketSameLine": false,
+        "tabWidth": 2,
+        "semi": true,
+        "useTabs": true,
+        "arrowParens": "avoid"
       }
     ],
-    "no-unused-vars": "warn"
+    "no-unused-vars": "warn",
+    "arrow-parens": [
+      "warn",
+      "as-needed"
+    ],
+    "class-methods-use-this": "off"
   }
 }
