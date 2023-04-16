@@ -3,13 +3,21 @@
 	font-size: 0.8125rem;
 	/* 13/16 */
 
+	&__excel {
+		max-height: 100vh;
+	}
+
 	&__header {
 		height: 34px;
 		padding: 8px 0;
 		background: $light-blue;
 	}
 
-	&__main {}
+	&__main {
+		max-height: calc(100vh - 34px);
+		display: flex;
+		flex-direction: column;
+	}
 }
 
 .header-document {
@@ -60,7 +68,8 @@
 	}
 
 	&__table {
-		overflow: auto;
+		flex: 1 1 auto;
+		overflow: scroll;
 	}
 }
 
