@@ -8,7 +8,6 @@ export default class Formula extends ExcelComponent {
 	constructor(root) {
 		super(root, {
 			name: 'Formula',
-			listeners: ['input', 'click'],
 		});
 	}
 
@@ -16,13 +15,5 @@ export default class Formula extends ExcelComponent {
 		return `
 		<div class="document-formula__info">fx</div>
 		<div class="document-formula__input" contenteditable="true" spellcheck="false"></div>`;
-	}
-
-	onInput() {
-		console.log('input');
-	}
-
-	onClick() {
-		console.log('click');
 	}
 }
