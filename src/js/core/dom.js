@@ -24,6 +24,22 @@ class Dom {
 		this.elem.removeEventListener(event, callback);
 		return this;
 	}
+
+	get cHeight() {
+		return this.elem.clientHeight;
+	}
+
+	get style() {
+		return this.elem.style;
+	}
+
+	get scrollX() {
+		return this.elem.scrollLeft;
+	}
+
+	get scrollY() {
+		return this.elem.scrollTop;
+	}
 }
 
 export default function $(selector) {

@@ -4,48 +4,64 @@ const CHAR_CODES = {
 };
 
 const COLUMNS_COUNT = CHAR_CODES.Z - CHAR_CODES.A;
-
-function getCell() {
-	return '<li class="document-table__cell" contenteditable="true"></li>';
-}
+let rowCached;
 
 function getColumn(_, index) {
 	return `<li class="document-table__column">${String.fromCharCode(CHAR_CODES.A + index)}</li>`;
 }
 
-function getRowInfo(index) {
-	return `<div class="document-table__row-info">${index || ''}</div>`;
+function getHeader() {
+	let header = '<ul class="document-table__header">';
+	header += new Array(COLUMNS_COUNT).fill('').map(getColumn).join('');
+	return `${header}</ul>`;
+}
+
+function getInfo(_, index) {
+	return `<li class="document-table__info-row">${index + 1}</li>`;
+}
+
+function getInfoColumn(rowsCount) {
+	let info = '<ul class="document-table__info-column">';
+	info += new Array(rowsCount).fill('').map(getInfo).join('');
+	return `${info}</ul>`;
+}
+
+function getCell() {
+	return '<li class="document-table__cell" contenteditable="true"></li>';
 }
 
 function getCells() {
-	let columns = '<ul class="document-table__row-cells">';
-	columns += new Array(COLUMNS_COUNT).fill('').map(getCell).join('');
-	return `${columns}</ul>`;
+	let cells = '<ul class="document-table__row-cells">';
+	cells += new Array(COLUMNS_COUNT).fill('').map(getCell).join('');
+	return `${cells}</ul>`;
 }
 
-function getRow(_, index) {
-	let row = '<li class="document-table__row">';
-	row += getRowInfo(index + 1);
-	row += getCells();
-	return `${row}</li>`;
+function getRow() {
+	if (!rowCached) {
+		let row = '<li class="document-table__row">';
+		row += getCells();
+		row += `${row}</li>`;
+		rowCached = row;
+	}
+	return rowCached;
 }
 
-function getHeaderColumns() {
-	let columns = '<ul class="document-table__row-columns">';
-	columns += new Array(COLUMNS_COUNT).fill('').map(getColumn).join('');
-	return `${columns}</ul>`;
+function getRows(rowsCount) {
+	let rows = '<ul class="document-table__rows">';
+	rows += new Array(rowsCount).fill('').map(getRow).join('');
+	return `${rows}</ul>`;
 }
 
-function getHeaderRow() {
-	let row = '<li class="document-table__row">';
-	row += getRowInfo();
-	row += getHeaderColumns();
-	return `${row}</li>`;
+function getBody(rowsCount) {
+	let body = '<div class="document-table__body">';
+	body += getInfoColumn(rowsCount);
+	body += getRows(rowsCount);
+	return `${body}</div>`;
 }
 
 export default function createTableHTML(rowsCount) {
-	let tableHTML = '<ul class="document-table__rows">';
-	tableHTML += getHeaderRow();
-	tableHTML += new Array(rowsCount).fill('').map(getRow).join('');
-	return `${tableHTML}</ul>`;
+	let tableHTML = `<div class="document-table__info-row document-table__info-row_empty"></div>`;
+	tableHTML += getHeader();
+	tableHTML += getBody(rowsCount);
+	return tableHTML;
 }
