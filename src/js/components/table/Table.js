@@ -1,5 +1,6 @@
 import ExcelComponent from '../../core/ExcelComponent';
 import $ from '../../core/dom';
+import { getScrollBarWidth } from '../../core/utils';
 import createTableHTML from './table.template';
 
 export default class Table extends ExcelComponent {
@@ -24,7 +25,9 @@ export default class Table extends ExcelComponent {
 
 		this.body.on('scroll', this.updateTableRowsHeight);
 		this.rows.on('scroll', this.updateTableColumnsScroll);
+		this.updateScrollBarWidthCssProperty();
 		window.addEventListener('resize', this.updateTableRowsHeight);
+		window.addEventListener('resize', this.updateScrollBarWidthCssProperty);
 	}
 
 	toHTML() {
@@ -42,5 +45,9 @@ export default class Table extends ExcelComponent {
 		requestAnimationFrame(() => {
 			this.header.style.transform = `translateX(-${this.rows.scrollX}px)`;
 		});
+	}
+
+	updateScrollBarWidthCssProperty() {
+		document.documentElement.style.setProperty('--scrollbar-width', `${getScrollBarWidth()}px`);
 	}
 }
