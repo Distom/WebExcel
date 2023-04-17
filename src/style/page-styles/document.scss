@@ -3,13 +3,21 @@
 	font-size: 0.8125rem;
 	/* 13/16 */
 
+	&__excel {
+		max-height: 100vh;
+	}
+
 	&__header {
 		height: 34px;
 		padding: 8px 0;
 		background: $light-blue;
 	}
 
-	&__main {}
+	&__main {
+		max-height: calc(100vh - 34px);
+		display: flex;
+		flex-direction: column;
+	}
 }
 
 .header-document {
@@ -60,7 +68,8 @@
 	}
 
 	&__table {
-		overflow: auto;
+		flex: 1 1 auto;
+		overflow: hidden;
 	}
 }
 
@@ -100,7 +109,7 @@
 
 .document-formula {
 	&__info {
-		flex: 0 0 46px;
+		flex: 0 0 $info-cell-width;
 		text-align: center;
 		border-right: 1px solid $border-color;
 		padding: 5px 10px;
@@ -116,33 +125,112 @@
 }
 
 .document-table {
-	&__rows {}
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	background: $table-grey;
 
-	&__row {
-		display: flex;
-		height: 26px;
+	&::before,
+	&::after {
+		content: '';
+		position: absolute;
+		border: 1px solid $border-color;
+		background: $table-grey;
 	}
 
-	&__row-info {
-		min-width: 46px;
+	&::before {
+		bottom: 0;
+		left: 0;
+		width: $info-cell-width;
+		height: var(--scrollbar-width);
+	}
+
+	&::after {
+		top: 0;
+		right: 0;
+		width: var(--scrollbar-width);
+		height: calc($row-height);
+		border-top: 0;
+	}
+
+	&__info-column {
+		flex: 0 0 $info-cell-width;
+	}
+
+	&__info-row {
 		border: 1px solid $border-color;
 		border-top: 0;
 		border-left: 0;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: rgba(128, 128, 128, 0.1);
+		background: $table-grey;
+		width: $info-cell-width;
+
+		&:last-child {
+			position: relative;
+			min-height: calc(var(--scrollbar-width) + $row-height + 1px);
+			padding-bottom: calc(var(--scrollbar-width) + 1px);
+
+			&::before {
+				content: '';
+				position: absolute;
+				top: calc($row-height - 1px);
+				left: 0;
+				width: 100%;
+				height: 1px;
+				background: $border-color;
+			}
+		}
+
+		&_empty {
+			position: absolute;
+			top: 0;
+			left: 0;
+			z-index: 50;
+		}
 	}
 
-	&__row-columns,
+	&__rows {
+		flex: 1 1 auto;
+		max-width: calc(100% - $info-cell-width);
+		overflow-x: scroll;
+		overflow-y: hidden;
+	}
+
+	&__row {
+		display: flex;
+	}
+
+	&__info-row,
+	&__row {
+		height: $row-height;
+	}
+
+	&__header,
 	&__row-cells {
 		display: flex;
 	}
 
+	&__header {
+		position: sticky;
+		top: 0;
+		flex: 0 0 $row-height;
+		min-width: fit-content;
+		padding-left: $info-cell-width;
+	}
+
+	&__body {
+		display: flex;
+		flex: 1 1 auto;
+		overflow-y: scroll;
+		overflow-x: hidden;
+	}
+
 	&__column,
 	&__cell {
-		height: 26px;
-		width: 100px;
+		height: $row-height;
+		width: $cell-width;
 		border: 1px solid $border-color;
 		border-top: 0;
 		border-left: 0;
@@ -152,6 +240,10 @@
 
 	&__column {
 		justify-content: center;
-		background: rgba(128, 128, 128, 0.1);
+		background: $table-grey;
+	}
+
+	&__cell {
+		background: #fff;
 	}
 }

@@ -1,4 +1,4 @@
-import capitalize from './utils';
+import { capitalize } from './utils';
 
 function getEventMethodName(eventName) {
 	return `on${capitalize(eventName)}`;
