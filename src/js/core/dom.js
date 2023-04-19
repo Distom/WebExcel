@@ -1,6 +1,15 @@
 class Dom {
 	constructor(selector) {
-		this.elem = typeof selector === 'string' ? document.querySelector(selector) : selector;
+		if (typeof selector === 'string') {
+			const elem = document.querySelector(selector);
+
+			// eslint-disable-next-line no-constructor-return
+			if (!elem) return {};
+
+			this.elem = elem;
+		} else {
+			this.elem = selector;
+		}
 	}
 
 	html(html) {
@@ -25,8 +34,64 @@ class Dom {
 		return this;
 	}
 
+	addClass(className) {
+		this.elem.classList.add(className);
+		return this;
+	}
+
+	delClass(className) {
+		this.elem.classList.remove(className);
+		return this;
+	}
+
+	closest(selector) {
+		return $(this.elem.closest(selector));
+	}
+
+	selectAll(selector) {
+		return this.elem.querySelectorAll(selector);
+	}
+
+	select(selector) {
+		return $(this.elem.querySelector(selector));
+	}
+
+	css(styles = {}) {
+		Object.keys(styles).forEach(prop => (this.elem.style[prop] = styles[prop]));
+		return this;
+	}
+
+	remove() {
+		this.elem.remove();
+		return this;
+	}
+
+	get children() {
+		return this.elem.children;
+	}
+
 	get cHeight() {
 		return this.elem.clientHeight;
+	}
+
+	get cWidth() {
+		return this.elem.clientWidth;
+	}
+
+	get oHeight() {
+		return this.elem.offsetHeight;
+	}
+
+	get oWidth() {
+		return this.elem.offsetWidth;
+	}
+
+	get sHeight() {
+		return this.elem.scrollHeight;
+	}
+
+	get sWidth() {
+		return this.elem.scrollWidth;
 	}
 
 	get style() {
@@ -40,10 +105,34 @@ class Dom {
 	get scrollY() {
 		return this.elem.scrollTop;
 	}
+
+	get top() {
+		return this.elem.getBoundingClientRect().top;
+	}
+
+	get bottom() {
+		return this.elem.getBoundingClientRect().bottom;
+	}
+
+	get left() {
+		return this.elem.getBoundingClientRect().left;
+	}
+
+	get right() {
+		return this.elem.getBoundingClientRect().right;
+	}
 }
 
 export default function $(selector) {
-	return new Dom(selector);
+	if (selector === null || selector === undefined) return undefined;
+
+	const obj = new Dom(selector);
+
+	if (Object.keys(obj).length === 0) {
+		return undefined;
+	}
+
+	return obj;
 }
 
 $.create = (tagName, className = '') => {

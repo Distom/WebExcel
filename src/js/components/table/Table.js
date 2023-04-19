@@ -1,7 +1,7 @@
 import ExcelComponent from '../../core/ExcelComponent';
-import $ from '../../core/dom';
-import { getScrollBarWidth } from '../../core/utils';
-import createTableHTML from './table.template';
+import Resizer from './Resizer';
+import Scroll from './Scroll';
+import Template from './Template';
 
 export default class Table extends ExcelComponent {
 	static className = 'main-document__table document-table';
@@ -11,43 +11,41 @@ export default class Table extends ExcelComponent {
 	constructor(root) {
 		super(root, {
 			name: 'Table',
+			listeners: ['pointerdown', 'pointerup', 'pointermove'],
 		});
-		this.updateTableColumnsScroll = this.updateTableColumnsScroll.bind(this);
-		this.updateTableRowsHeight = this.updateTableRowsHeight.bind(this);
+
+		this.template = new Template(1000);
 	}
 
 	init() {
 		super.init();
 
-		this.header = $('.document-table__header');
-		this.rows = $('.document-table__rows');
-		this.body = $('.document-table__body');
+		this.header = this.root.select('[data-table="header"]');
+		this.info = this.root.select('[data-table="info"]');
+		this.rows = this.root.select('[data-table="rows"]');
+		this.body = this.root.select('[data-table="body"]');
 
-		this.body.on('scroll', this.updateTableRowsHeight);
-		this.rows.on('scroll', this.updateTableColumnsScroll);
-		this.updateScrollBarWidthCssProperty();
-		window.addEventListener('resize', this.updateTableRowsHeight);
-		window.addEventListener('resize', this.updateScrollBarWidthCssProperty);
+		this.headersList = this.root.select('[data-table-role="headers-list"]');
+		this.rowsList = this.root.select('[data-table-role="rows-list"]');
+		this.indexesList = this.root.select('[data-table-role="indexes-list"]');
+
+		this.resizer = new Resizer(this, 5);
+		this.scroll = new Scroll(this);
 	}
 
 	toHTML() {
-		return createTableHTML(1000);
+		return this.template.html;
 	}
 
-	updateTableRowsHeight() {
-		requestAnimationFrame(() => {
-			const tableRowsHeight = this.root.cHeight - this.header.cHeight;
-			this.rows.style.height = `${tableRowsHeight + this.body.scrollY}px`;
-		});
+	onPointerdown(event) {
+		this.resizer.onPointerdown(event);
 	}
 
-	updateTableColumnsScroll() {
-		requestAnimationFrame(() => {
-			this.header.style.transform = `translateX(-${this.rows.scrollX}px)`;
-		});
+	onPointermove(event) {
+		this.resizer.onPointermove(event);
 	}
 
-	updateScrollBarWidthCssProperty() {
-		document.documentElement.style.setProperty('--scrollbar-width', `${getScrollBarWidth()}px`);
+	onPointerup(event) {
+		this.resizer.onPointerup(event);
 	}
 }
