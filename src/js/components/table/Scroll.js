@@ -19,13 +19,13 @@ export default class Scroll {
 	updateTableRowsHeight() {
 		requestAnimationFrame(() => {
 			const tableRowsHeight = this.table.root.cHeight - this.table.header.cHeight;
-			this.table.rows.style.height = `${tableRowsHeight + this.table.body.scrollY}px`;
+			this.table.rows.css({ height: `${tableRowsHeight + this.table.body.scrollY}px` });
 		});
 	}
 
 	updateTableColumnsScroll() {
 		requestAnimationFrame(() => {
-			this.table.header.style.marginLeft = `-${this.table.rows.scrollX}px`;
+			this.table.header.css({ marginLeft: `-${this.table.rows.scrollX}px` });
 		});
 	}
 }

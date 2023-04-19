@@ -1,5 +1,4 @@
 import ExcelComponent from '../../core/ExcelComponent';
-import $ from '../../core/dom';
 import Resizer from './Resizer';
 import Scroll from './Scroll';
 import Template from './Template';
@@ -21,10 +20,14 @@ export default class Table extends ExcelComponent {
 	init() {
 		super.init();
 
-		this.header = $('.document-table__header');
-		this.info = $('.document-table__info-column');
-		this.rows = $('.document-table__rows');
-		this.body = $('.document-table__body');
+		this.header = this.root.select('[data-table="header"]');
+		this.info = this.root.select('[data-table="info"]');
+		this.rows = this.root.select('[data-table="rows"]');
+		this.body = this.root.select('[data-table="body"]');
+
+		this.headersList = this.root.select('[data-table-role="headers-list"]');
+		this.rowsList = this.root.select('[data-table-role="rows-list"]');
+		this.indexesList = this.root.select('[data-table-role="indexes-list"]');
 
 		this.resizer = new Resizer(this, 5);
 		this.scroll = new Scroll(this);
@@ -35,9 +38,7 @@ export default class Table extends ExcelComponent {
 	}
 
 	onPointerdown(event) {
-		if (event.target.closest('[data-resize]')) {
-			this.resizer.onPointerdown(event);
-		}
+		this.resizer.onPointerdown(event);
 	}
 
 	onPointermove(event) {

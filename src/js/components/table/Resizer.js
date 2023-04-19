@@ -15,7 +15,7 @@ export default class Resizer {
 	constructor(table, minElemSize) {
 		this.table = table;
 		this.minElemSize = minElemSize;
-		this.resizerWidth = $('.document-table__resizer_column').oWidth;
+		this.resizerWidth = $('[data-resizer="col"]').oWidth;
 	}
 
 	get resizer() {
@@ -35,7 +35,7 @@ export default class Resizer {
 	}
 
 	get resizerType() {
-		return this.#resizer?.elem.dataset.resize;
+		return this.#resizer?.elem.dataset.resizer;
 	}
 
 	updateChordsRange() {
@@ -43,17 +43,17 @@ export default class Resizer {
 
 		this.X = {
 			max: this.table.root.cWidth - scrollbarWidth - this.resizerWidth,
-			min: this.listElem.left + this.minElemSize,
+			min: this.resizable.left + this.minElemSize,
 		};
 
 		this.Y = {
 			max: window.innerHeight - scrollbarWidth - this.resizerWidth,
-			min: this.listElem.top + this.minElemSize,
+			min: this.resizable.top + this.minElemSize,
 		};
 	}
 
 	initResizer(event) {
-		this.listElem = $(this.resizer.closest('li'));
+		this.resizable = this.resizer.closest('[data-resizable]');
 		this.updateChordsRange();
 
 		this.resizerTop = this.resizer.top;
@@ -73,7 +73,7 @@ export default class Resizer {
 
 			requestAnimationFrame(() => {
 				if (!this.resizer) return;
-				this.resizer.style.top = `${y}px`;
+				this.resizer.css({ top: `${y}px` });
 			});
 		} else if (this.resizerType === 'col') {
 			let x = event.clientX - this.leftCompensation;
@@ -82,7 +82,7 @@ export default class Resizer {
 
 			requestAnimationFrame(() => {
 				if (!this.resizer) return;
-				this.resizer.style.left = `${x}px`;
+				this.resizer.css({ left: `${x}px` });
 			});
 		}
 	}
@@ -95,22 +95,25 @@ export default class Resizer {
 	}
 
 	setPositionFixed() {
-		this.resizer.style.top = `${this.resizerTop}px`;
-		this.resizer.style.left = `${this.resizerLeft}px`;
-		this.resizer.style.position = 'fixed';
+		this.resizer.css({
+			top: `${this.resizerTop}px`,
+			left: `${this.resizerLeft}px`,
+			position: 'fixed',
+		});
 	}
 
 	removePositionFixed() {
-		this.resizer.style.top = '';
-		this.resizer.style.left = '';
-		this.resizer.style.position = '';
+		this.resizer.css({
+			top: '',
+			left: '',
+			position: '',
+		});
 	}
 
 	onPointerdown(event) {
-		const resizer = event.target.closest('[data-resize]');
-		if (!resizer) return;
+		this.resizer = $(event.target).closest('[data-resizer]');
+		if (!this.resizer) return;
 
-		this.resizer = $(resizer);
 		event.target.setPointerCapture(event.pointerId);
 		this.initResizer(event);
 	}
@@ -124,11 +127,11 @@ export default class Resizer {
 		if (!this.resizer) return;
 
 		if (this.resizerType === 'row') {
-			const newHeight = this.resizer.bottom - this.listElem.top - Math.ceil(this.resizerWidth / 2);
+			const newHeight = this.resizer.bottom - this.resizable.top - Math.ceil(this.resizerWidth / 2);
 
 			this.updateRowHeight(this.getIndex(), newHeight);
 		} else if (this.resizerType === 'col') {
-			const newWidth = this.resizer.right - this.listElem.left - Math.ceil(this.resizerWidth / 2);
+			const newWidth = this.resizer.right - this.resizable.left - Math.ceil(this.resizerWidth / 2);
 
 			this.updateColumnWidth(this.getIndex(), newWidth);
 		}
@@ -140,23 +143,28 @@ export default class Resizer {
 		let index;
 
 		if (this.resizerType === 'row') {
-			index = Array.from(this.table.info.children).indexOf(this.listElem.elem);
+			index = Array.from(this.table.indexesList.children).indexOf(this.resizable.elem);
 		} else if (this.resizerType === 'col') {
-			index = Array.from(this.table.header.children).indexOf(this.listElem.elem);
+			index = Array.from(this.table.headersList.children).indexOf(this.resizable.elem);
 		}
 
 		return index;
 	}
 
 	updateColumnWidth(index, width) {
-		this.table.header.children[index].style.width = `${width}px`;
-		Array.from(this.table.rows.children)
-			.map(row => row.firstElementChild.children[index])
-			.forEach(cell => (cell.style.width = `${width}px`));
+		const header = $(this.table.headersList.children[index]);
+		header.css({ width: `${width}px` });
+
+		Array.from(this.table.rowsList.children)
+			.map(row => $(row).select('[data-table-role="cells-list"]').children[index])
+			.forEach(cell => $(cell).css({ width: `${width}px` }));
 	}
 
 	updateRowHeight(index, height) {
-		this.table.info.children[index].style.height = `${height}px`;
-		this.table.rows.children[index].style.height = `${height}px`;
+		const info = $(this.table.indexesList.children[index]);
+		const row = $(this.table.rowsList.children[index]);
+
+		info.css({ height: `${height}px` });
+		row.css({ height: `${height}px` });
 	}
 }

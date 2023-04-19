@@ -1,18 +1,20 @@
+import $ from './dom';
+
 function capitalize(string) {
 	return string[0].toUpperCase() + string.slice(1);
 }
 
 function getScrollBarWidth() {
-	const div = document.createElement('div');
-	div.style.cssText = `
-	height: 200px;
-	width: 100px;
-	position: fixed;
-	top: 0;
-	left: -150px;
-	overflow: scroll;`;
-	document.body.append(div);
-	const scrollBarWidth = div.offsetWidth - div.clientWidth;
+	const div = $.create('div').css({
+		height: '200px',
+		width: '100px',
+		position: 'fixed',
+		top: 0,
+		left: '-150px',
+		overflow: 'scroll',
+	});
+	document.body.append(div.elem);
+	const scrollBarWidth = div.oWidth - div.cWidth;
 	div.remove();
 	return scrollBarWidth;
 }

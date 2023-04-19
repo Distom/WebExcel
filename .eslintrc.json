@@ -44,6 +44,7 @@
     "no-return-assign": [
       "error",
       "except-parens"
-    ]
+    ],
+    "no-use-before-define": "off"
   }
 }

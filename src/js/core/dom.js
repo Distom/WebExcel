@@ -1,6 +1,15 @@
 class Dom {
 	constructor(selector) {
-		this.elem = typeof selector === 'string' ? document.querySelector(selector) : selector;
+		if (typeof selector === 'string') {
+			const elem = document.querySelector(selector);
+
+			// eslint-disable-next-line no-constructor-return
+			if (!elem) return {};
+
+			this.elem = elem;
+		} else {
+			this.elem = selector;
+		}
 	}
 
 	html(html) {
@@ -36,7 +45,7 @@ class Dom {
 	}
 
 	closest(selector) {
-		return this.elem.closest(selector);
+		return $(this.elem.closest(selector));
 	}
 
 	selectAll(selector) {
@@ -44,7 +53,17 @@ class Dom {
 	}
 
 	select(selector) {
-		return this.elem.querySelector(selector);
+		return $(this.elem.querySelector(selector));
+	}
+
+	css(styles = {}) {
+		Object.keys(styles).forEach(prop => (this.elem.style[prop] = styles[prop]));
+		return this;
+	}
+
+	remove() {
+		this.elem.remove();
+		return this;
 	}
 
 	get children() {
@@ -105,7 +124,15 @@ class Dom {
 }
 
 export default function $(selector) {
-	return new Dom(selector);
+	if (selector === null || selector === undefined) return undefined;
+
+	const obj = new Dom(selector);
+
+	if (Object.keys(obj).length === 0) {
+		return undefined;
+	}
+
+	return obj;
 }
 
 $.create = (tagName, className = '') => {

@@ -17,23 +17,27 @@ export default class Template {
 	}
 
 	getColumn(_, index) {
-		return `<li class="document-table__column">${String.fromCharCode(this.charCodes.A + index)}
-	<div class="document-table__resizer document-table__resizer_column" data-resize="col"></div></li>`;
+		return `<li class="document-table__column" data-resizable>${String.fromCharCode(
+			this.charCodes.A + index,
+		)}
+	<div class="document-table__resizer document-table__resizer_column" data-resizer="col"></div></li>`;
 	}
 
 	getHeader() {
-		let header = '<ul class="document-table__header">';
+		let header =
+			'<ul class="document-table__header" data-table="header" data-table-role="headers-list">';
 		header += new Array(this.colsCount).fill('').map(this.getColumn).join('');
 		return `${header}</ul>`;
 	}
 
 	getInfo(_, index) {
-		return `<li class="document-table__info-row">${index + 1}
-	<div class="document-table__resizer document-table__resizer_row" data-resize="row"></div></li>`;
+		return `<li class="document-table__info-row"  data-resizable>${index + 1}
+	<div class="document-table__resizer document-table__resizer_row" data-resizer="row"></div></li>`;
 	}
 
 	getInfoColumn() {
-		let info = '<ul class="document-table__info-column">';
+		let info =
+			'<ul class="document-table__info-column" data-table="info" data-table-role="indexes-list">';
 		info += new Array(this.rowsCount).fill('').map(this.getInfo).join('');
 		return `${info}</ul>`;
 	}
@@ -43,7 +47,7 @@ export default class Template {
 	}
 
 	getCells() {
-		let cells = '<ul class="document-table__row-cells">';
+		let cells = '<ul class="document-table__row-cells" data-table-role="cells-list">';
 		cells += new Array(this.colsCount).fill('').map(this.getCell).join('');
 		return `${cells}</ul>`;
 	}
@@ -58,13 +62,13 @@ export default class Template {
 	}
 
 	getRows() {
-		let rows = '<ul class="document-table__rows">';
+		let rows = '<ul class="document-table__rows" data-table="rows" data-table-role="rows-list">';
 		rows += new Array(this.rowsCount).fill('').map(this.getRow).join('');
 		return `${rows}</ul>`;
 	}
 
 	getBody() {
-		let body = '<div class="document-table__body">';
+		let body = '<div class="document-table__body" data-table="body">';
 		body += this.getInfoColumn(this.rowsCount);
 		body += this.getRows(this.rowsCount);
 		return `${body}</div>`;
