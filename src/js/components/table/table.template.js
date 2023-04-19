@@ -7,7 +7,8 @@ const COLUMNS_COUNT = CHAR_CODES.Z - CHAR_CODES.A;
 let rowCached;
 
 function getColumn(_, index) {
-	return `<li class="document-table__column">${String.fromCharCode(CHAR_CODES.A + index)}</li>`;
+	return `<li class="document-table__column">${String.fromCharCode(CHAR_CODES.A + index)}
+	<div class="document-table__resizer document-table__resizer_column" data-resize="col"></div></li>`;
 }
 
 function getHeader() {
@@ -17,7 +18,8 @@ function getHeader() {
 }
 
 function getInfo(_, index) {
-	return `<li class="document-table__info-row">${index + 1}</li>`;
+	return `<li class="document-table__info-row">${index + 1}
+	<div class="document-table__resizer document-table__resizer_row" data-resize="row"></div></li>`;
 }
 
 function getInfoColumn(rowsCount) {
@@ -27,7 +29,7 @@ function getInfoColumn(rowsCount) {
 }
 
 function getCell() {
-	return '<li class="document-table__cell" contenteditable="true"></li>';
+	return `<li class="document-table__cell" contenteditable="true"></li>`;
 }
 
 function getCells() {

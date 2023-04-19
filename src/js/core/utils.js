@@ -17,4 +17,26 @@ function getScrollBarWidth() {
 	return scrollBarWidth;
 }
 
-export { capitalize, getScrollBarWidth };
+function updateCssProperty(property, value) {
+	document.documentElement.style.setProperty(property, value);
+}
+
+function updateCssPropertyScrollBarWidth() {
+	updateCssProperty('--scrollbar-width', `${getScrollBarWidth()}px`);
+}
+
+function bindAll(obj) {
+	const prototype = Object.getPrototypeOf(obj);
+	Object.getOwnPropertyNames(prototype).forEach(key => {
+		if (key === 'constructor') return;
+		obj[key] = obj[key].bind(obj);
+	});
+}
+
+export {
+	capitalize,
+	getScrollBarWidth,
+	updateCssProperty,
+	updateCssPropertyScrollBarWidth,
+	bindAll,
+};

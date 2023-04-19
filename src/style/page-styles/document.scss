@@ -143,6 +143,7 @@
 		left: 0;
 		width: $info-cell-width;
 		height: var(--scrollbar-width);
+		z-index: 1;
 	}
 
 	&::after {
@@ -153,8 +154,94 @@
 		border-top: 0;
 	}
 
+	&__resizer {
+		position: absolute;
+		opacity: 0;
+		background-color: grey;
+		z-index: 1;
+
+		&:hover {
+			opacity: 1;
+		}
+
+		&::before {
+			content: '';
+			position: absolute;
+			background-color: $table-grey;
+		}
+
+		&::after {
+			display: none;
+			content: '';
+			position: absolute;
+			background: $border-color;
+		}
+
+		&_column {
+			right: -5px;
+			top: calc(($row-height - $resizer-width) / 2);
+			width: 9px;
+			height: $resizer-width;
+
+			&:hover {
+				cursor: col-resize;
+			}
+
+			&::before {
+
+				height: 100%;
+				width: 5px;
+				top: 0;
+				left: 2px;
+			}
+
+			&::after {
+
+				top: calc(($resizer-width - $row-height) / 2);
+				left: 3px;
+				width: 3px;
+				height: 100vh;
+
+			}
+		}
+
+		&_row {
+			$resizer-width: calc($resizer-width + 10px);
+			width: calc($resizer-width);
+			bottom: -5px;
+			left: calc(($info-cell-width - $resizer-width) / 2);
+			height: 9px;
+
+			&:hover {
+				cursor: row-resize;
+			}
+
+			&::before {
+				width: 100%;
+				height: 5px;
+				top: 2px;
+				left: 0;
+			}
+
+			&::after {
+				top: 3px;
+				left: calc((20px - $info-cell-width) / 2);
+				width: 100vw;
+				height: 3px;
+			}
+		}
+
+		&.active {
+			&::after {
+				display: block;
+			}
+		}
+	}
+
 	&__info-column {
 		flex: 0 0 $info-cell-width;
+		height: fit-content;
+		margin-bottom: $cell-width;
 	}
 
 	&__info-row {
@@ -166,22 +253,7 @@
 		justify-content: center;
 		background: $table-grey;
 		width: $info-cell-width;
-
-		&:last-child {
-			position: relative;
-			min-height: calc(var(--scrollbar-width) + $row-height + 1px);
-			padding-bottom: calc(var(--scrollbar-width) + 1px);
-
-			&::before {
-				content: '';
-				position: absolute;
-				top: calc($row-height - 1px);
-				left: 0;
-				width: 100%;
-				height: 1px;
-				background: $border-color;
-			}
-		}
+		position: relative;
 
 		&_empty {
 			position: absolute;
@@ -193,13 +265,14 @@
 
 	&__rows {
 		flex: 1 1 auto;
-		max-width: calc(100% - $info-cell-width);
 		overflow-x: scroll;
 		overflow-y: hidden;
 	}
 
 	&__row {
 		display: flex;
+		margin-right: $cell-width;
+		width: fit-content;
 	}
 
 	&__info-row,
@@ -229,18 +302,18 @@
 
 	&__column,
 	&__cell {
-		height: $row-height;
 		width: $cell-width;
 		border: 1px solid $border-color;
 		border-top: 0;
 		border-left: 0;
-		display: flex;
-		align-items: center;
 	}
 
 	&__column {
+		display: flex;
 		justify-content: center;
 		background: $table-grey;
+		position: relative;
+		align-items: center;
 	}
 
 	&__cell {

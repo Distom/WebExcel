@@ -25,8 +25,54 @@ class Dom {
 		return this;
 	}
 
+	addClass(className) {
+		this.elem.classList.add(className);
+		return this;
+	}
+
+	delClass(className) {
+		this.elem.classList.remove(className);
+		return this;
+	}
+
+	closest(selector) {
+		return this.elem.closest(selector);
+	}
+
+	selectAll(selector) {
+		return this.elem.querySelectorAll(selector);
+	}
+
+	select(selector) {
+		return this.elem.querySelector(selector);
+	}
+
+	get children() {
+		return this.elem.children;
+	}
+
 	get cHeight() {
 		return this.elem.clientHeight;
+	}
+
+	get cWidth() {
+		return this.elem.clientWidth;
+	}
+
+	get oHeight() {
+		return this.elem.offsetHeight;
+	}
+
+	get oWidth() {
+		return this.elem.offsetWidth;
+	}
+
+	get sHeight() {
+		return this.elem.scrollHeight;
+	}
+
+	get sWidth() {
+		return this.elem.scrollWidth;
 	}
 
 	get style() {
@@ -39,6 +85,22 @@ class Dom {
 
 	get scrollY() {
 		return this.elem.scrollTop;
+	}
+
+	get top() {
+		return this.elem.getBoundingClientRect().top;
+	}
+
+	get bottom() {
+		return this.elem.getBoundingClientRect().bottom;
+	}
+
+	get left() {
+		return this.elem.getBoundingClientRect().left;
+	}
+
+	get right() {
+		return this.elem.getBoundingClientRect().right;
 	}
 }
 
