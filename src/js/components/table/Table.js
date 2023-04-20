@@ -20,6 +20,13 @@ export default class Table extends ExcelComponent {
 	init() {
 		super.init();
 
+		this.initHTMLElements();
+
+		this.scroll = new Scroll(this);
+		this.resizer = new Resizer(this, 5);
+	}
+
+	initHTMLElements() {
 		this.header = this.root.select('[data-table="header"]');
 		this.info = this.root.select('[data-table="info"]');
 		this.rows = this.root.select('[data-table="rows"]');
@@ -28,9 +35,6 @@ export default class Table extends ExcelComponent {
 		this.headersList = this.root.select('[data-table-role="headers-list"]');
 		this.rowsList = this.root.select('[data-table-role="rows-list"]');
 		this.indexesList = this.root.select('[data-table-role="indexes-list"]');
-
-		this.resizer = new Resizer(this, 5);
-		this.scroll = new Scroll(this);
 	}
 
 	toHTML() {
