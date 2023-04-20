@@ -1,5 +1,5 @@
 import $ from '../../core/dom';
-import { cellChords, range } from '../../core/utils';
+import { cellChords, getScrollBarWidth, range } from '../../core/utils';
 
 export default class Selection {
 	static activeClass = 'active';
@@ -146,12 +146,38 @@ export default class Selection {
 
 		const nextCell = this.table.root.select(`[data-cell-id="${col}:${row}"]`);
 
+		this.scrollToCell(nextCell);
+
 		this.clearSelected();
 		/* add active cell to selected because on poinermove
 		selected arr clears and if user click on cell and 
 		don`t move pointer selected arr will be empty */
 		this.selected.push(nextCell);
 		this.active = nextCell;
+	}
+
+	scrollToCell(cell) {
+		const cellLeft = cell.left - this.table.info.oWidth + this.table.rows.scrollX;
+		const cellRight = cellLeft + cell.oWidth;
+		const cellTop = cell.top - this.table.body.top + this.table.body.scrollY;
+		const cellBottom = cellTop + cell.oHeight;
+
+		const scrollBarWidth = getScrollBarWidth();
+
+		const tableVisibleHeight = this.table.root.oHeight - this.table.header.oHeight - scrollBarWidth;
+		const tableVisibleWidth = this.table.root.oWidth - this.table.info.oWidth - scrollBarWidth;
+
+		if (this.table.body.scrollY > cellTop) {
+			this.table.body.scrollTo({ top: cellTop });
+		} else if (this.table.body.scrollY + tableVisibleHeight < cellBottom) {
+			this.table.body.scrollTo({ top: cellBottom - tableVisibleHeight });
+		}
+
+		if (this.table.rows.scrollX > cellLeft) {
+			this.table.rows.scrollTo({ left: cellLeft });
+		} else if (this.table.rows.scrollX + tableVisibleWidth < cellRight) {
+			this.table.rows.scrollTo({ left: cellRight - tableVisibleWidth });
+		}
 	}
 
 	selectGroup(lastSelected) {

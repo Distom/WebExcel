@@ -75,6 +75,11 @@ class Dom {
 		return this;
 	}
 
+	scrollTo(...args) {
+		this.elem.scrollTo(...args);
+		return this;
+	}
+
 	set tabIndex(value) {
 		this.elem.tabIndex = value;
 	}
