@@ -36,7 +36,7 @@
 
 		&:hover,
 		&:focus {
-			outline: 1px solid black;
+			outline: 1px solid #000;
 			border-radius: 4px;
 		}
 	}
@@ -108,19 +108,27 @@
 }
 
 .document-formula {
+	min-height: $row-height;
+	border-top: 0;
+
 	&__info {
 		flex: 0 0 $info-cell-width;
 		text-align: center;
 		border-right: 1px solid $border-color;
-		padding: 5px 10px;
-		font-size: 1rem;
-		font-style: italic;
-		color: grey;
 	}
 
 	&__input {
 		flex: 1 1 auto;
-		padding: 3px 10px;
+		padding: 3px 15px;
+	}
+
+	&__fx {
+		font-size: 1rem;
+		font-family: 'Times New Roman', Times, serif;
+		font-style: italic;
+		font-weight: 600;
+		color: grey;
+		padding-left: 15px;
 	}
 }
 
@@ -318,5 +326,14 @@
 
 	&__cell {
 		background: #fff;
+		padding: 5px;
+
+		&.active {
+			border: 2px solid $selected-border-color;
+		}
+
+		&.selected {
+			background: $selected-color;
+		}
 	}
 }

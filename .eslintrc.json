@@ -45,6 +45,7 @@
       "error",
       "except-parens"
     ],
-    "no-use-before-define": "off"
+    "no-use-before-define": "off",
+    "no-constructor-return": "off"
   }
 }

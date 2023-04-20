@@ -3,7 +3,6 @@ class Dom {
 		if (typeof selector === 'string') {
 			const elem = document.querySelector(selector);
 
-			// eslint-disable-next-line no-constructor-return
 			if (!elem) return {};
 
 			this.elem = elem;
@@ -64,6 +63,24 @@ class Dom {
 	remove() {
 		this.elem.remove();
 		return this;
+	}
+
+	focus() {
+		this.elem.focus();
+		return this;
+	}
+
+	blur() {
+		this.elem.blur();
+		return this;
+	}
+
+	set tabIndex(value) {
+		this.elem.tabIndex = value;
+	}
+
+	get data() {
+		return this.elem.dataset;
 	}
 
 	get children() {

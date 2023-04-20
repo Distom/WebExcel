@@ -2,6 +2,10 @@ import $ from '../../core/dom';
 import { getScrollBarWidth } from '../../core/utils';
 
 export default class Resizer {
+	static activeClass = 'active';
+
+	static instance;
+
 	#resizer;
 
 	resizerTop;
@@ -13,9 +17,13 @@ export default class Resizer {
 	leftCompensation;
 
 	constructor(table, minElemSize) {
+		if (Resizer.instance) return Resizer.instance;
+
 		this.table = table;
 		this.minElemSize = minElemSize;
 		this.resizerWidth = $('[data-resizer="col"]').oWidth;
+
+		Resizer.instance = this;
 	}
 
 	get resizer() {
@@ -24,18 +32,47 @@ export default class Resizer {
 
 	set resizer(resizer) {
 		if (this.#resizer) {
-			this.#resizer.delClass('active');
+			this.#resizer.delClass(Resizer.activeClass);
 		}
 
 		if (resizer) {
-			resizer.addClass('active');
+			resizer.addClass(Resizer.activeClass);
 		}
 
 		this.#resizer = resizer;
 	}
 
 	get resizerType() {
-		return this.#resizer?.elem.dataset.resizer;
+		return this.#resizer?.data.resizer;
+	}
+
+	onPointerdown(event) {
+		this.resizer = $(event.target).closest('[data-resizer]');
+		if (!this.resizer) return;
+
+		event.target.setPointerCapture(event.pointerId);
+		this.initResizer(event);
+	}
+
+	onPointermove(event) {
+		if (!this.resizer) return;
+		this.moveResizer(event);
+	}
+
+	onPointerup() {
+		if (!this.resizer) return;
+
+		if (this.resizerType === 'row') {
+			const newHeight = this.resizer.bottom - this.resizable.top - Math.ceil(this.resizerWidth / 2);
+
+			this.updateRowHeight(this.getIndex(), newHeight);
+		} else if (this.resizerType === 'col') {
+			const newWidth = this.resizer.right - this.resizable.left - Math.ceil(this.resizerWidth / 2);
+
+			this.updateColumnWidth(this.getIndex(), newWidth);
+		}
+
+		this.endResizer();
 	}
 
 	updateChordsRange() {
@@ -108,35 +145,6 @@ export default class Resizer {
 			left: '',
 			position: '',
 		});
-	}
-
-	onPointerdown(event) {
-		this.resizer = $(event.target).closest('[data-resizer]');
-		if (!this.resizer) return;
-
-		event.target.setPointerCapture(event.pointerId);
-		this.initResizer(event);
-	}
-
-	onPointermove(event) {
-		if (!this.resizer) return;
-		this.moveResizer(event);
-	}
-
-	onPointerup() {
-		if (!this.resizer) return;
-
-		if (this.resizerType === 'row') {
-			const newHeight = this.resizer.bottom - this.resizable.top - Math.ceil(this.resizerWidth / 2);
-
-			this.updateRowHeight(this.getIndex(), newHeight);
-		} else if (this.resizerType === 'col') {
-			const newWidth = this.resizer.right - this.resizable.left - Math.ceil(this.resizerWidth / 2);
-
-			this.updateColumnWidth(this.getIndex(), newWidth);
-		}
-
-		this.endResizer();
 	}
 
 	getIndex() {

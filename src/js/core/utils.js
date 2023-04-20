@@ -35,10 +35,25 @@ function bindAll(obj) {
 	});
 }
 
+function cellChords(cell) {
+	const [col, row] = cell.data.cellId.split(':');
+	return {
+		col: +col,
+		row: +row,
+	};
+}
+
+function range(a, b) {
+	const [min, max] = a > b ? [b, a] : [a, b];
+	return new Array(max - min + 1).fill('').map((_, index) => min + index);
+}
+
 export {
 	capitalize,
 	getScrollBarWidth,
 	updateCssProperty,
 	updateCssPropertyScrollBarWidth,
 	bindAll,
+	cellChords,
+	range,
 };

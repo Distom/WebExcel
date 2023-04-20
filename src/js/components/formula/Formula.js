@@ -13,7 +13,8 @@ export default class Formula extends ExcelComponent {
 
 	toHTML() {
 		return `
-		<div class="document-formula__info">fx</div>
+		<div class="document-formula__info">A1</div>
+		<div class="document-formula__fx">fx</div>
 		<div class="document-formula__input" contenteditable="true" spellcheck="false"></div>`;
 	}
 }

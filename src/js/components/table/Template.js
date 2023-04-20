@@ -6,9 +6,7 @@ export default class Template {
 		Z: 90,
 	};
 
-	colsCount = this.charCodes.Z - this.charCodes.A;
-
-	rowCached;
+	colsCount = this.charCodes.Z - this.charCodes.A + 1;
 
 	constructor(rowsCount = 10) {
 		this.rowsCount = rowsCount;
@@ -17,9 +15,7 @@ export default class Template {
 	}
 
 	getColumn(_, index) {
-		return `<li class="document-table__column" data-resizable>${String.fromCharCode(
-			this.charCodes.A + index,
-		)}
+		return `<li class="document-table__column" data-resizable>${this.getColLetter(index)}
 	<div class="document-table__resizer document-table__resizer_column" data-resizer="col"></div></li>`;
 	}
 
@@ -42,42 +38,55 @@ export default class Template {
 		return `${info}</ul>`;
 	}
 
-	getCell() {
-		return `<li class="document-table__cell" contenteditable="true"></li>`;
+	getCell(colIndex, rowIndex) {
+		return `<li class="document-table__cell" contenteditable="true" data-table="cell" data-cell-id="${colIndex}:${rowIndex}"></li>`;
 	}
 
-	getCells() {
+	getCells(rowIndex) {
 		let cells = '<ul class="document-table__row-cells" data-table-role="cells-list">';
-		cells += new Array(this.colsCount).fill('').map(this.getCell).join('');
+
+		cells += new Array(this.colsCount)
+			.fill('')
+			.map((_, colIndex) => this.getCell(colIndex, rowIndex))
+			.join('');
+
 		return `${cells}</ul>`;
 	}
 
-	getRow() {
-		if (!this.rowCached) {
-			let row = '<li class="document-table__row">';
-			row += `${this.getCells()}</li>`;
-			this.rowCached = row;
-		}
-		return this.rowCached;
+	getRow(index) {
+		return `<li class="document-table__row">${this.getCells(index)}</li>`;
 	}
 
 	getRows() {
 		let rows = '<ul class="document-table__rows" data-table="rows" data-table-role="rows-list">';
-		rows += new Array(this.rowsCount).fill('').map(this.getRow).join('');
+
+		rows += new Array(this.rowsCount)
+			.fill('')
+			.map((_, index) => this.getRow(index))
+			.join('');
+
 		return `${rows}</ul>`;
 	}
 
 	getBody() {
 		let body = '<div class="document-table__body" data-table="body">';
+
 		body += this.getInfoColumn(this.rowsCount);
 		body += this.getRows(this.rowsCount);
+
 		return `${body}</div>`;
 	}
 
 	createTable() {
 		let tableHTML = `<div class="document-table__info-row document-table__info-row_empty"></div>`;
+
 		tableHTML += this.getHeader();
 		tableHTML += this.getBody(this.rowsCount);
+
 		return tableHTML;
+	}
+
+	getColLetter(index) {
+		return String.fromCharCode(this.charCodes.A + index);
 	}
 }

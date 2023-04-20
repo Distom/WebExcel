@@ -1,6 +1,7 @@
 import ExcelComponent from '../../core/ExcelComponent';
 import Resizer from './Resizer';
 import Scroll from './Scroll';
+import Selection from './Selection';
 import Template from './Template';
 
 export default class Table extends ExcelComponent {
@@ -11,7 +12,7 @@ export default class Table extends ExcelComponent {
 	constructor(root) {
 		super(root, {
 			name: 'Table',
-			listeners: ['pointerdown', 'pointerup', 'pointermove'],
+			listeners: ['pointerdown', 'pointerup', 'pointermove', 'dblclick', 'keydown', 'keyup'],
 		});
 
 		this.template = new Template(1000);
@@ -23,7 +24,8 @@ export default class Table extends ExcelComponent {
 		this.initHTMLElements();
 
 		this.scroll = new Scroll(this);
-		this.resizer = new Resizer(this, 5);
+		this.resizer = new Resizer(this, 7);
+		this.selection = new Selection(this);
 	}
 
 	initHTMLElements() {
@@ -35,6 +37,8 @@ export default class Table extends ExcelComponent {
 		this.headersList = this.root.select('[data-table-role="headers-list"]');
 		this.rowsList = this.root.select('[data-table-role="rows-list"]');
 		this.indexesList = this.root.select('[data-table-role="indexes-list"]');
+
+		this.root.tabIndex = 0;
 	}
 
 	toHTML() {
@@ -43,13 +47,28 @@ export default class Table extends ExcelComponent {
 
 	onPointerdown(event) {
 		this.resizer.onPointerdown(event);
+		this.selection.onPointerdown(event);
 	}
 
 	onPointermove(event) {
 		this.resizer.onPointermove(event);
+		this.selection.onPointermove(event);
 	}
 
 	onPointerup(event) {
 		this.resizer.onPointerup(event);
+		this.selection.onPointerup(event);
+	}
+
+	onDblclick(event) {
+		this.selection.onDblclick(event);
+	}
+
+	onKeydown(event) {
+		this.selection.onKeydown(event);
+	}
+
+	onKeyup(event) {
+		// this.selection.onKeyup(event);
 	}
 }
