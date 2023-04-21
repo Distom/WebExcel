@@ -336,4 +336,11 @@
 			background: $selected-color;
 		}
 	}
+
+	&__column,
+	&__info-row {
+		&.selected {
+			background: $dark-selected-color;
+		}
+	}
 }

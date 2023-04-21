@@ -12,7 +12,7 @@ export default class Table extends ExcelComponent {
 	constructor(root) {
 		super(root, {
 			name: 'Table',
-			listeners: ['pointerdown', 'pointerup', 'pointermove', 'dblclick', 'keydown', 'keyup'],
+			listeners: ['pointerdown', 'pointerup', 'pointermove', 'dblclick', 'keydown'],
 		});
 
 		this.template = new Template(1000);
@@ -66,9 +66,5 @@ export default class Table extends ExcelComponent {
 
 	onKeydown(event) {
 		this.selection.onKeydown(event);
-	}
-
-	onKeyup(event) {
-		// this.selection.onKeyup(event);
 	}
 }

@@ -22,17 +22,30 @@ export default class Selection {
 		if (Selection.instance) return Selection.instance;
 
 		this.table = table;
-		this.active = this.table.root.select('[data-table="cell"]');
+
+		this.selectionObserver = new MutationObserver(this.observeSelection.bind(this));
+		this.selectionObserver.observe(table.root.elem, {
+			subtree: true,
+			attributes: true,
+			attributeFilter: ['class'],
+		});
+
+		this.active = this.table.root.select('[data-cell-id="0:0"]');
 
 		Selection.instance = this;
 	}
 
 	set active(cell) {
+		if (cell.elem === this.#active?.elem) return;
+
 		if (this.#active) {
 			this.#active.delClass(Selection.activeClass);
 		}
 
 		this.table.root.focus();
+		this.clearSelected();
+		this.selected.push(cell);
+		this.lastSelected = cell;
 		this.#active = cell.addClass(Selection.activeClass);
 	}
 
@@ -51,12 +64,6 @@ export default class Selection {
 		event.preventDefault();
 		event.target.setPointerCapture(event.pointerId);
 
-		this.clearSelected();
-		/* add active cell to selected because on poinermove
-		selected arr clears and if user click on cell and 
-		don`t move pointer selected arr will be empty */
-		this.selected.push(cell);
-
 		if (event.shiftKey) {
 			this.selectGroup(cell);
 		} else {
@@ -74,6 +81,8 @@ export default class Selection {
 
 		const lastSelected = $(hoveredElem).closest('[data-table="cell"]');
 		this.selectGroup(lastSelected);
+
+		this.scrollRows(event);
 	}
 
 	onPointerup() {
@@ -148,12 +157,29 @@ export default class Selection {
 
 		this.scrollToCell(nextCell);
 
-		this.clearSelected();
-		/* add active cell to selected because on poinermove
-		selected arr clears and if user click on cell and 
-		don`t move pointer selected arr will be empty */
-		this.selected.push(nextCell);
 		this.active = nextCell;
+	}
+
+	scrollRows(event) {
+		const scrollStep = 5;
+		const scrollBarWidth = getScrollBarWidth();
+
+		const scrollBarLeft = this.table.root.oWidth - scrollBarWidth;
+		const scrollBarTop = this.table.root.oHeight + this.table.root.top - scrollBarWidth;
+		const scrollBarRight = this.table.info.oWidth;
+		const scrollBarBottom = this.table.root.top + this.table.header.oHeight;
+
+		if (event.pageX >= scrollBarLeft) {
+			this.table.rows.scrollBy({ left: scrollStep });
+		} else if (event.pageX <= scrollBarRight) {
+			this.table.rows.scrollBy({ left: -scrollStep });
+		}
+
+		if (event.pageY >= scrollBarTop) {
+			this.table.body.scrollBy({ top: scrollStep });
+		} else if (event.pageY <= scrollBarBottom) {
+			this.table.body.scrollBy({ top: -scrollStep });
+		}
 	}
 
 	scrollToCell(cell) {
@@ -181,7 +207,8 @@ export default class Selection {
 	}
 
 	selectGroup(lastSelected) {
-		if (this.lastSelected === lastSelected || !lastSelected) return;
+		if (!lastSelected) return;
+		if (this.lastSelected?.elem === lastSelected.elem) return;
 
 		this.clearSelected();
 		this.lastSelected = lastSelected;
@@ -197,18 +224,35 @@ export default class Selection {
 
 				this.selected.push(cell);
 
-				// don`t add selected class to active elem while selected.length < 2
-				if (cell.elem === this.active.elem) return;
-
 				cell.addClass(Selection.selectedClass);
 			});
 		});
 
-		if (this.selected.length > 1) this.active.addClass(Selection.selectedClass);
+		if (this.selected.length === 1) this.active.delClass(Selection.selectedClass);
 	}
 
 	clearSelected() {
 		this.selected.forEach(cell => cell.delClass(Selection.selectedClass));
 		this.selected = [];
+		this.lastSelected = null;
+	}
+
+	observeSelection(mutations) {
+		mutations.forEach(mutation => {
+			const cell = $(mutation.target).closest('[data-table="cell"]');
+			if (!cell) return;
+
+			const { col, row } = cellChords(cell);
+			const header = $(this.table.headersList.children[col]);
+			const info = $(this.table.indexesList.children[row]);
+
+			if (cell.hasClass(Selection.selectedClass) || cell.hasClass(Selection.activeClass)) {
+				header.addClass(Selection.selectedClass);
+				info.addClass(Selection.selectedClass);
+			} else if (!cell.hasClass(Selection.selectedClass) && !cell.hasClass(Selection.activeClass)) {
+				header.delClass(Selection.selectedClass);
+				info.delClass(Selection.selectedClass);
+			}
+		});
 	}
 }

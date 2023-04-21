@@ -34,13 +34,21 @@ class Dom {
 	}
 
 	addClass(className) {
-		this.elem.classList.add(className);
+		if (!this.hasClass(className)) {
+			this.elem.classList.add(className);
+		}
 		return this;
 	}
 
 	delClass(className) {
-		this.elem.classList.remove(className);
+		if (this.hasClass(className)) {
+			this.elem.classList.remove(className);
+		}
 		return this;
+	}
+
+	hasClass(className) {
+		return this.elem.classList.contains(className);
 	}
 
 	closest(selector) {
@@ -77,6 +85,11 @@ class Dom {
 
 	scrollTo(...args) {
 		this.elem.scrollTo(...args);
+		return this;
+	}
+
+	scrollBy(...args) {
+		this.elem.scrollBy(...args);
 		return this;
 	}
 
