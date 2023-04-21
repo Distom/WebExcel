@@ -36,7 +36,7 @@
 
 		&:hover,
 		&:focus {
-			outline: 1px solid black;
+			outline: 1px solid #000;
 			border-radius: 4px;
 		}
 	}
@@ -108,19 +108,27 @@
 }
 
 .document-formula {
-	&__info {
-		flex: 0 0 $info-cell-width;
+	min-height: $row-height;
+	border-top: 0;
+
+	&__chords {
+		flex: 0 0 96px;
 		text-align: center;
 		border-right: 1px solid $border-color;
-		padding: 5px 10px;
-		font-size: 1rem;
-		font-style: italic;
-		color: grey;
 	}
 
 	&__input {
 		flex: 1 1 auto;
-		padding: 3px 10px;
+		padding: 3px 15px;
+	}
+
+	&__fx {
+		font-size: 1rem;
+		font-family: 'Times New Roman', Times, serif;
+		font-style: italic;
+		font-weight: 600;
+		color: grey;
+		padding-left: 15px;
 	}
 }
 
@@ -318,5 +326,31 @@
 
 	&__cell {
 		background: #fff;
+		padding: 5px;
+		cursor: default;
+
+		&:focus {
+			cursor: text;
+			outline: 2px solid $edited-outline-color;
+			position: relative;
+			z-index: 1;
+			min-height: 100%;
+			height: fit-content;
+		}
+
+		&.active {
+			border: 2px solid $selected-border-color;
+		}
+
+		&.selected {
+			background: $selected-color;
+		}
+	}
+
+	&__column,
+	&__info-row {
+		&.selected {
+			background: $dark-selected-color;
+		}
 	}
 }

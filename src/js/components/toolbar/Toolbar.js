@@ -5,9 +5,10 @@ export default class Toolbar extends ExcelComponent {
 
 	static tagName = 'section';
 
-	constructor(root) {
+	constructor(root, options = {}) {
 		super(root, {
 			name: 'Toolbar',
+			...options,
 		});
 	}
 

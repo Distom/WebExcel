@@ -3,7 +3,6 @@ class Dom {
 		if (typeof selector === 'string') {
 			const elem = document.querySelector(selector);
 
-			// eslint-disable-next-line no-constructor-return
 			if (!elem) return {};
 
 			this.elem = elem;
@@ -15,6 +14,12 @@ class Dom {
 	html(html) {
 		if (typeof html !== 'string') return this.elem.outerHTML.trim();
 		this.elem.innerHTML = html;
+		return this;
+	}
+
+	text(textContent) {
+		if (typeof textContent !== 'string') return this.elem.textContent;
+		this.elem.textContent = textContent;
 		return this;
 	}
 
@@ -35,13 +40,21 @@ class Dom {
 	}
 
 	addClass(className) {
-		this.elem.classList.add(className);
+		if (!this.hasClass(className)) {
+			this.elem.classList.add(className);
+		}
 		return this;
 	}
 
 	delClass(className) {
-		this.elem.classList.remove(className);
+		if (this.hasClass(className)) {
+			this.elem.classList.remove(className);
+		}
 		return this;
+	}
+
+	hasClass(className) {
+		return this.elem.classList.contains(className);
 	}
 
 	closest(selector) {
@@ -64,6 +77,46 @@ class Dom {
 	remove() {
 		this.elem.remove();
 		return this;
+	}
+
+	focus() {
+		this.elem.focus();
+		return this;
+	}
+
+	blur() {
+		this.elem.blur();
+		return this;
+	}
+
+	scrollTo(...args) {
+		this.elem.scrollTo(...args);
+		return this;
+	}
+
+	scrollBy(...args) {
+		this.elem.scrollBy(...args);
+		return this;
+	}
+
+	set hidden(value) {
+		this.elem.hidden = value;
+	}
+
+	get hidden() {
+		return this.elem.hidden;
+	}
+
+	set tabIndex(value) {
+		this.elem.tabIndex = value;
+	}
+
+	get fChild() {
+		return this.elem.firstChild;
+	}
+
+	get data() {
+		return this.elem.dataset;
 	}
 
 	get children() {

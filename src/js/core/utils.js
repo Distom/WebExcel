@@ -35,10 +35,43 @@ function bindAll(obj) {
 	});
 }
 
+function cellChords(cell) {
+	const [col, row] = cell.data.cellId.split(':');
+	return {
+		col: +col,
+		row: +row,
+	};
+}
+
+function getRange(a, b) {
+	const [min, max] = a > b ? [b, a] : [a, b];
+	return new Array(max - min + 1).fill('').map((_, index) => min + index);
+}
+
+function getLetterKeyCodes() {
+	const CODE_A = 65;
+
+	const letterKeyCodes = new Array(26)
+		.fill('')
+		.map((_, index) => `Key${String.fromCharCode(CODE_A + index)}`);
+
+	return letterKeyCodes;
+}
+
+function getFormatChord(cell) {
+	const CODE_A = 65;
+	const [col, row] = cell.data.cellId.split(':');
+	return `${String.fromCharCode(CODE_A + +col)}${+row + 1}`;
+}
+
 export {
 	capitalize,
 	getScrollBarWidth,
 	updateCssProperty,
 	updateCssPropertyScrollBarWidth,
 	bindAll,
+	cellChords,
+	getRange,
+	getLetterKeyCodes,
+	getFormatChord,
 };
