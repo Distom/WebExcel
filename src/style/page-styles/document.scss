@@ -111,8 +111,8 @@
 	min-height: $row-height;
 	border-top: 0;
 
-	&__info {
-		flex: 0 0 $info-cell-width;
+	&__chords {
+		flex: 0 0 96px;
 		text-align: center;
 		border-right: 1px solid $border-color;
 	}
@@ -327,6 +327,16 @@
 	&__cell {
 		background: #fff;
 		padding: 5px;
+		cursor: default;
+
+		&:focus {
+			cursor: text;
+			outline: 2px solid $edited-outline-color;
+			position: relative;
+			z-index: 1;
+			min-height: 100%;
+			height: fit-content;
+		}
 
 		&.active {
 			border: 2px solid $selected-border-color;

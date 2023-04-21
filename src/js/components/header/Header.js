@@ -5,9 +5,10 @@ export default class Header extends ExcelComponent {
 
 	static tagName = 'header';
 
-	constructor(root) {
+	constructor(root, options = {}) {
 		super(root, {
 			name: 'Header',
+			...options,
 		});
 	}
 

@@ -1,5 +1,7 @@
 import $ from '../../core/dom';
-import { cellChords, getScrollBarWidth, range } from '../../core/utils';
+import { cellChords, getLetterKeyCodes, getScrollBarWidth, getRange } from '../../core/utils';
+
+let scrollBarWidth = getScrollBarWidth();
 
 export default class Selection {
 	static activeClass = 'active';
@@ -8,15 +10,25 @@ export default class Selection {
 
 	static instance;
 
-	static navigationKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'];
+	static navigationKeys = [
+		'ArrowUp',
+		'ArrowDown',
+		'ArrowLeft',
+		'ArrowRight',
+		'Tab',
+		'Enter',
+		'Delete',
+		'Escape',
+		...getLetterKeyCodes(),
+	];
 
 	#active;
+
+	#lastSelected;
 
 	selectionActive = false;
 
 	selected = [];
-
-	lastSelected;
 
 	constructor(table) {
 		if (Selection.instance) return Selection.instance;
@@ -42,6 +54,9 @@ export default class Selection {
 			this.#active.delClass(Selection.activeClass);
 		}
 
+		this.table.emit('cell:changed', cell.text());
+		this.table.emit('table:select', { start: cell });
+
 		this.table.root.focus();
 		this.clearSelected();
 		this.selected.push(cell);
@@ -53,6 +68,17 @@ export default class Selection {
 		return this.#active;
 	}
 
+	set lastSelected(cell) {
+		this.#lastSelected = cell;
+		if (!cell) return;
+
+		this.table.emit('table:select', { end: cell });
+	}
+
+	get lastSelected() {
+		return this.#lastSelected;
+	}
+
 	get cellFocused() {
 		return !!document.activeElement.closest('[data-table="cell"]');
 	}
@@ -60,6 +86,7 @@ export default class Selection {
 	onPointerdown(event) {
 		const cell = $(event.target).closest('[data-table="cell"]');
 		if (!cell) return;
+		if (this.cellFocused && this.active.elem === cell.elem) return;
 
 		event.preventDefault();
 		event.target.setPointerCapture(event.pointerId);
@@ -69,6 +96,8 @@ export default class Selection {
 		} else {
 			this.active = cell;
 		}
+
+		scrollBarWidth = getScrollBarWidth();
 
 		this.selectionActive = true;
 	}
@@ -90,7 +119,24 @@ export default class Selection {
 	}
 
 	onDblclick() {
-		this.active.focus();
+		this.focusActiveCell();
+	}
+
+	focusActiveCell() {
+		const textNode = this.active.fChild;
+
+		if (textNode) {
+			const range = document.createRange();
+			const sel = window.getSelection();
+
+			range.setStart(textNode, this.active.text().length);
+			range.collapse(true);
+
+			sel.removeAllRanges();
+			sel.addRange(range);
+		} else {
+			this.active.focus();
+		}
 	}
 
 	onKeydown(event) {
@@ -98,27 +144,73 @@ export default class Selection {
 
 		let { col, row } = cellChords(this.active);
 
+		if (this.cellFocused) {
+			switch (event.code) {
+				case 'Enter':
+					event.preventDefault();
+
+					if (event.shiftKey) {
+						row -= 1;
+					} else {
+						row += 1;
+					}
+					break;
+
+				case 'Escape':
+					event.preventDefault();
+					this.table.root.focus();
+					return;
+
+				// no default
+			}
+		} else {
+			if (getLetterKeyCodes().includes(event.code)) {
+				this.active.text('');
+				this.focusActiveCell();
+				this.clearSelected();
+				this.selected.push(this.active);
+				this.lastSelected = this.active;
+
+				return;
+			}
+
+			switch (event.code) {
+				case 'ArrowUp':
+					event.preventDefault();
+					row -= 1;
+					break;
+
+				case 'ArrowDown':
+					event.preventDefault();
+					row += 1;
+					break;
+
+				case 'ArrowLeft':
+					event.preventDefault();
+					col -= 1;
+					break;
+
+				case 'ArrowRight':
+					event.preventDefault();
+					col += 1;
+					break;
+
+				case 'Enter':
+					event.preventDefault();
+					this.focusActiveCell();
+					return;
+
+				case 'Delete':
+					event.preventDefault();
+					this.active.text('');
+					this.table.emit('cell:input', this.active.text());
+					return;
+
+				// no default
+			}
+		}
+
 		switch (event.code) {
-			case 'ArrowUp':
-				event.preventDefault();
-				row -= 1;
-				break;
-
-			case 'ArrowDown':
-				event.preventDefault();
-				row += 1;
-				break;
-
-			case 'ArrowLeft':
-				event.preventDefault();
-				col -= 1;
-				break;
-
-			case 'ArrowRight':
-				event.preventDefault();
-				col += 1;
-				break;
-
 			case 'Tab':
 				event.preventDefault();
 
@@ -130,21 +222,6 @@ export default class Selection {
 
 				break;
 
-			case 'Enter':
-				event.preventDefault();
-
-				if (this.cellFocused) {
-					if (event.shiftKey) {
-						row -= 1;
-					} else {
-						row += 1;
-					}
-				} else {
-					this.active.focus();
-					return;
-				}
-
-				break;
 			// no default
 		}
 
@@ -162,7 +239,6 @@ export default class Selection {
 
 	scrollRows(event) {
 		const scrollStep = 5;
-		const scrollBarWidth = getScrollBarWidth();
 
 		const scrollBarLeft = this.table.root.oWidth - scrollBarWidth;
 		const scrollBarTop = this.table.root.oHeight + this.table.root.top - scrollBarWidth;
@@ -188,7 +264,7 @@ export default class Selection {
 		const cellTop = cell.top - this.table.body.top + this.table.body.scrollY;
 		const cellBottom = cellTop + cell.oHeight;
 
-		const scrollBarWidth = getScrollBarWidth();
+		scrollBarWidth = getScrollBarWidth();
 
 		const tableVisibleHeight = this.table.root.oHeight - this.table.header.oHeight - scrollBarWidth;
 		const tableVisibleWidth = this.table.root.oWidth - this.table.info.oWidth - scrollBarWidth;
@@ -213,8 +289,8 @@ export default class Selection {
 		this.clearSelected();
 		this.lastSelected = lastSelected;
 
-		const colsIds = range(cellChords(this.active).col, cellChords(lastSelected).col);
-		const rowsIds = range(cellChords(this.active).row, cellChords(lastSelected).row);
+		const colsIds = getRange(cellChords(this.active).col, cellChords(lastSelected).col);
+		const rowsIds = getRange(cellChords(this.active).row, cellChords(lastSelected).row);
 
 		rowsIds.forEach(rowId => {
 			colsIds.forEach(colId => {

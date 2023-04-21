@@ -9,10 +9,11 @@ export default class Table extends ExcelComponent {
 
 	static tagName = 'section';
 
-	constructor(root) {
+	constructor(root, options = {}) {
 		super(root, {
 			name: 'Table',
-			listeners: ['pointerdown', 'pointerup', 'pointermove', 'dblclick', 'keydown'],
+			listeners: ['pointerdown', 'pointerup', 'pointermove', 'dblclick', 'keydown', 'input'],
+			...options,
 		});
 
 		this.template = new Template(1000);
@@ -26,6 +27,9 @@ export default class Table extends ExcelComponent {
 		this.scroll = new Scroll(this);
 		this.resizer = new Resizer(this, 7);
 		this.selection = new Selection(this);
+
+		this.on('formula:input', text => this.selection.active.text(text));
+		this.on('formula:focus-cell', () => this.selection.focusActiveCell());
 	}
 
 	initHTMLElements() {
@@ -66,5 +70,11 @@ export default class Table extends ExcelComponent {
 
 	onKeydown(event) {
 		this.selection.onKeydown(event);
+	}
+
+	onInput(event) {
+		if (event.target.closest('[data-table="cell"]')) {
+			this.emit('cell:input', this.selection.active.text());
+		}
 	}
 }

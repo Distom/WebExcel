@@ -17,6 +17,12 @@ class Dom {
 		return this;
 	}
 
+	text(textContent) {
+		if (typeof textContent !== 'string') return this.elem.textContent;
+		this.elem.textContent = textContent;
+		return this;
+	}
+
 	append(elem) {
 		const node = elem instanceof Dom ? elem.elem : elem;
 		this.elem.append(node);
@@ -93,8 +99,20 @@ class Dom {
 		return this;
 	}
 
+	set hidden(value) {
+		this.elem.hidden = value;
+	}
+
+	get hidden() {
+		return this.elem.hidden;
+	}
+
 	set tabIndex(value) {
 		this.elem.tabIndex = value;
+	}
+
+	get fChild() {
+		return this.elem.firstChild;
 	}
 
 	get data() {
