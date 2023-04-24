@@ -8,15 +8,22 @@ export default class Template {
 
 	colsCount = this.charCodes.Z - this.charCodes.A + 1;
 
-	constructor(rowsCount = 10) {
+	constructor(table, rowsCount = 10) {
+		this.table = table;
+		this.state = table.store.getState();
 		this.rowsCount = rowsCount;
 		bindAll(this);
 		this.html = this.createTable();
 	}
 
 	getColumn(_, index) {
-		return `<li class="document-table__column" data-resizable>${this.getColLetter(index)}
-	<div class="document-table__resizer document-table__resizer_column" data-resizer="col"></div></li>`;
+		const width = this.state.colsState[index];
+		const widthStyle = width ? `width: ${width}px;` : '';
+		return `<li class="document-table__column" data-resizable style="${widthStyle}">${this.getColLetter(
+			index,
+		)}
+			<div class="document-table__resizer document-table__resizer_column" data-resizer="col"></div>
+		</li>`;
 	}
 
 	getHeader() {
@@ -27,8 +34,11 @@ export default class Template {
 	}
 
 	getInfo(_, index) {
-		return `<li class="document-table__info-row"  data-resizable>${index + 1}
-	<div class="document-table__resizer document-table__resizer_row" data-resizer="row"></div></li>`;
+		const height = this.state.rowsState[index];
+		const heightStyle = height ? `height: ${height}px;` : '';
+		return `<li class="document-table__info-row"  data-resizable style="${heightStyle}">${index + 1}
+			<div class="document-table__resizer document-table__resizer_row" data-resizer="row"></div>
+		</li>`;
 	}
 
 	getInfoColumn() {
@@ -39,7 +49,13 @@ export default class Template {
 	}
 
 	getCell(colIndex, rowIndex) {
-		return `<li class="document-table__cell" contenteditable="true" data-table="cell" data-cell-id="${colIndex}:${rowIndex}"></li>`;
+		const id = `${colIndex}:${rowIndex}`;
+		const text = this.state.cellsState[id] || '';
+
+		const width = this.state.colsState[colIndex];
+		const widthStyle = width ? `width: ${width}px;` : '';
+
+		return `<li class="document-table__cell" contenteditable="true" data-table="cell" data-cell-id="${id}" style="${widthStyle}">${text}</li>`;
 	}
 
 	getCells(rowIndex) {
@@ -54,7 +70,9 @@ export default class Template {
 	}
 
 	getRow(index) {
-		return `<li class="document-table__row">${this.getCells(index)}</li>`;
+		const height = this.state.rowsState[index];
+		const heightStyle = height ? `height: ${height}px;` : '';
+		return `<li class="document-table__row" style="${heightStyle}">${this.getCells(index)}</li>`;
 	}
 
 	getRows() {

@@ -1,10 +1,9 @@
 import $ from '../../core/dom';
 import { getScrollBarWidth } from '../../core/utils';
+import { tableResize } from '../store/actions';
 
 export default class Resizer {
 	static activeClass = 'active';
-
-	static instance;
 
 	#resizer;
 
@@ -17,13 +16,9 @@ export default class Resizer {
 	leftCompensation;
 
 	constructor(table, minElemSize) {
-		if (Resizer.instance) return Resizer.instance;
-
 		this.table = table;
 		this.minElemSize = minElemSize;
 		this.resizerWidth = $('[data-resizer="col"]').oWidth;
-
-		Resizer.instance = this;
 	}
 
 	get resizer() {
@@ -166,6 +161,8 @@ export default class Resizer {
 		Array.from(this.table.rowsList.children)
 			.map(row => $(row).select('[data-table-role="cells-list"]').children[index])
 			.forEach(cell => $(cell).css({ width: `${width}px` }));
+
+		this.table.dispatch(tableResize(index, width, 'col'));
 	}
 
 	updateRowHeight(index, height) {
@@ -174,5 +171,7 @@ export default class Resizer {
 
 		info.css({ height: `${height}px` });
 		row.css({ height: `${height}px` });
+
+		this.table.dispatch(tableResize(index, height, 'row'));
 	}
 }

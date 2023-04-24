@@ -1,5 +1,5 @@
 import $ from '../../core/dom';
-import { cellChords, getLetterKeyCodes, getScrollBarWidth, getRange } from '../../core/utils';
+import { cellChords, getScrollBarWidth, getRange, getCharKeyCodes } from '../../core/utils';
 
 let scrollBarWidth = getScrollBarWidth();
 
@@ -7,8 +7,6 @@ export default class Selection {
 	static activeClass = 'active';
 
 	static selectedClass = 'selected';
-
-	static instance;
 
 	static navigationKeys = [
 		'ArrowUp',
@@ -19,7 +17,7 @@ export default class Selection {
 		'Enter',
 		'Delete',
 		'Escape',
-		...getLetterKeyCodes(),
+		...getCharKeyCodes(),
 	];
 
 	#active;
@@ -31,8 +29,6 @@ export default class Selection {
 	selected = [];
 
 	constructor(table) {
-		if (Selection.instance) return Selection.instance;
-
 		this.table = table;
 
 		this.selectionObserver = new MutationObserver(this.observeSelection.bind(this));
@@ -43,8 +39,6 @@ export default class Selection {
 		});
 
 		this.active = this.table.root.select('[data-cell-id="0:0"]');
-
-		Selection.instance = this;
 	}
 
 	set active(cell) {
@@ -147,8 +141,27 @@ export default class Selection {
 		if (this.cellFocused) {
 			switch (event.code) {
 				case 'Enter':
-					event.preventDefault();
+					/* if (event.ctrlKey) {
+						// const sel = window.getSelection();
+						// const cursor = sel.extentOffset;
+						// const text = this.active.text();
+						// this.active.text(`${text.slice(0, cursor)}<br>${text.slice(cursor)}`);
+						// const range = document.createRange();
+						// range.setStart(this.active.fChild, cursor);
+						// range.collapse(true);
+						// sel.removeAllRanges();
+						// sel.addRange(range);
 
+
+						// const enterEvent = new KeyboardEvent('keydown', {
+						// 	code: 'Enter',
+						// 	bubbles: true,
+						// });
+						// this.active.elem.dispatchEvent(enterEvent);
+						// console.log(enterEvent);
+						return;
+					} */
+					event.preventDefault();
 					if (event.shiftKey) {
 						row -= 1;
 					} else {
@@ -164,7 +177,7 @@ export default class Selection {
 				// no default
 			}
 		} else {
-			if (getLetterKeyCodes().includes(event.code)) {
+			if (getCharKeyCodes().includes(event.code)) {
 				this.active.text('');
 				this.focusActiveCell();
 				this.clearSelected();
@@ -201,6 +214,7 @@ export default class Selection {
 					return;
 
 				case 'Delete':
+				case 'Backspace':
 					event.preventDefault();
 					this.active.text('');
 					this.table.emit('cell:input', this.active.text());

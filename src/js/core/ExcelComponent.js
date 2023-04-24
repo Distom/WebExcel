@@ -7,7 +7,9 @@ export default class ExcelComponent extends DomListener {
 		super(root, options.listeners);
 		this.name = options.name || '';
 		this.emitter = options.emitter;
+		this.store = options.store;
 		this.options = options.options;
+		this.storeSubscribes = options.storeSubscribes || [];
 	}
 
 	toHTML() {
@@ -22,6 +24,16 @@ export default class ExcelComponent extends DomListener {
 		const unsub = this.emitter.subscribe(event, fn);
 		this.unsubs.push(unsub);
 	}
+
+	dispatch(action) {
+		this.store.dispatch(action);
+	}
+
+	isWatching(storeKey) {
+		return this.storeSubscribes.includes(storeKey);
+	}
+
+	storeChanged() {}
 
 	init() {
 		this.initEventListeners();

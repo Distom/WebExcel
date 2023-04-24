@@ -51,17 +51,54 @@ function getRange(a, b) {
 function getLetterKeyCodes() {
 	const CODE_A = 65;
 
-	const letterKeyCodes = new Array(26)
-		.fill('')
-		.map((_, index) => `Key${String.fromCharCode(CODE_A + index)}`);
+	return new Array(26).fill('').map((_, index) => `Key${String.fromCharCode(CODE_A + index)}`);
+}
 
-	return letterKeyCodes;
+function getDigitKeyCodes() {
+	return new Array(10).fill('').map((_, index) => `Digit${index}`);
+}
+
+function getSymbolKeyCodes() {
+	return [
+		'Backquote',
+		'Minus',
+		'Equal',
+		'Backslash',
+		'BracketLeft',
+		'BracketRight',
+		'Semicolon',
+		'Quote',
+		'Slash',
+		'Period',
+		'Comma',
+		'NumpadDivide',
+		'NumpadMultiply',
+		'NumpadSubtract',
+		'NumpadAdd',
+	];
+}
+
+function getCharKeyCodes() {
+	return [...getLetterKeyCodes(), ...getDigitKeyCodes(), ...getSymbolKeyCodes()];
 }
 
 function getFormatChord(cell) {
 	const CODE_A = 65;
 	const [col, row] = cell.data.cellId.split(':');
 	return `${String.fromCharCode(CODE_A + +col)}${+row + 1}`;
+}
+
+function isEqualObjects(a, b) {
+	return JSON.stringify(a) === JSON.stringify(b);
+}
+
+function localStore(key, value = null) {
+	if (!value) {
+		return JSON.parse(localStorage.getItem(key));
+	}
+
+	localStorage.setItem(key, JSON.stringify(value));
+	return true;
 }
 
 export {
@@ -73,5 +110,10 @@ export {
 	cellChords,
 	getRange,
 	getLetterKeyCodes,
+	getDigitKeyCodes,
+	getSymbolKeyCodes,
+	getCharKeyCodes,
 	getFormatChord,
+	isEqualObjects,
+	localStore,
 };

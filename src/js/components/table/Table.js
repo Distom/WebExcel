@@ -1,8 +1,10 @@
 import ExcelComponent from '../../core/ExcelComponent';
+import { textInput } from '../store/actions';
 import Resizer from './Resizer';
 import Scroll from './Scroll';
 import Selection from './Selection';
 import Template from './Template';
+import $ from '../../core/dom';
 
 export default class Table extends ExcelComponent {
 	static className = 'main-document__table document-table';
@@ -16,7 +18,7 @@ export default class Table extends ExcelComponent {
 			...options,
 		});
 
-		this.template = new Template(1000);
+		this.template = new Template(this, 1000);
 	}
 
 	init() {
@@ -28,7 +30,10 @@ export default class Table extends ExcelComponent {
 		this.resizer = new Resizer(this, 7);
 		this.selection = new Selection(this);
 
-		this.on('formula:input', text => this.selection.active.text(text));
+		this.on('formula:input', text => {
+			this.selection.active.text(text);
+			this.dispatch(textInput(this.selection.active.data.cellId, this.selection.active.text()));
+		});
 		this.on('formula:focus-cell', () => this.selection.focusActiveCell());
 	}
 
@@ -73,8 +78,10 @@ export default class Table extends ExcelComponent {
 	}
 
 	onInput(event) {
-		if (event.target.closest('[data-table="cell"]')) {
-			this.emit('cell:input', this.selection.active.text());
-		}
+		const cell = $(event.target).closest('[data-table="cell"]');
+		if (!cell) return;
+
+		this.emit('cell:input', this.selection.active.text());
+		this.dispatch(textInput(cell.data.cellId, this.selection.active.text()));
 	}
 }
