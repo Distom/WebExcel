@@ -1,5 +1,5 @@
 import ExcelComponent from '../../core/ExcelComponent';
-import { setStyles, textInput } from '../store/actions';
+import { setStyles, textInput } from '../../store/actions';
 import Resizer from './Resizer';
 import Scroll from './Scroll';
 import Selection from './Selection';

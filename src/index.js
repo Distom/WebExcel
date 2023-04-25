@@ -6,8 +6,8 @@ import Toolbar from './js/components/toolbar/Toolbar';
 import Formula from './js/components/formula/Formula';
 import Table from './js/components/table/Table';
 import createStore from './js/core/createStore';
-import rootReducer from './js/components/store/rootReducer';
-import initialState from './js/components/store/initialState';
+import rootReducer from './js/store/rootReducer';
+import initialState from './js/store/initialState';
 import { localStore } from './js/core/utils';
 
 const store = createStore(rootReducer, initialState);

@@ -1,4 +1,4 @@
-import { SET_STYLES, TABLE_RESIZE, TEXT_INPUT } from './types';
+import { CHANGE_TITLE, SET_STYLES, TABLE_RESIZE, TEXT_INPUT } from './types';
 
 export function tableResize(index, value, type) {
 	return {
@@ -27,6 +27,15 @@ export function setStyles(id, styles) {
 		data: {
 			id,
 			styles,
+		},
+	};
+}
+
+export function changeTitle(text) {
+	return {
+		type: CHANGE_TITLE,
+		data: {
+			text,
 		},
 	};
 }

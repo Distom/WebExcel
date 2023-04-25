@@ -1,6 +1,6 @@
 import $ from '../../core/dom';
 import { getScrollBarWidth } from '../../core/utils';
-import { tableResize } from '../store/actions';
+import { tableResize } from '../../store/actions';
 
 export default class Resizer {
 	static activeClass = 'active';

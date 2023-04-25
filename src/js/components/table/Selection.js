@@ -1,5 +1,6 @@
 import $ from '../../core/dom';
 import { cellChords, getScrollBarWidth, getRange, getCharKeyCodes } from '../../core/utils';
+import { textInput } from '../../store/actions';
 
 let scrollBarWidth = getScrollBarWidth();
 
@@ -222,8 +223,13 @@ export default class Selection {
 				case 'Delete':
 				case 'Backspace':
 					event.preventDefault();
-					this.active.text('');
-					this.table.emit('cell:input', this.active.text());
+
+					this.selected.forEach(cell => {
+						cell.text('');
+						this.table.dispatch(textInput(cell.data.cellId, ''));
+					});
+
+					this.table.emit('cell:input', '');
 					return;
 
 				// no default

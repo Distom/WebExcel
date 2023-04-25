@@ -1,6 +1,7 @@
-import { localStore } from '../../core/utils';
+import { localStore } from '../core/utils';
 
 const defaultState = {
+	title: 'New table',
 	colsState: {},
 	rowsState: {},
 	cellsState: {},
