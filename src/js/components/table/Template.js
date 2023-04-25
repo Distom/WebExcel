@@ -1,4 +1,4 @@
-import { bindAll } from '../../core/utils';
+import { bindAll, getInlineStyles } from '../../core/utils';
 
 export default class Template {
 	charCodes = {
@@ -50,12 +50,15 @@ export default class Template {
 
 	getCell(colIndex, rowIndex) {
 		const id = `${colIndex}:${rowIndex}`;
-		const text = this.state.cellsState[id] || '';
+		const text = this.state.cellsState[id]?.data || '';
+
+		let styles = this.state.cellsState[id]?.styles;
+		styles = styles ? getInlineStyles(styles) : '';
 
 		const width = this.state.colsState[colIndex];
 		const widthStyle = width ? `width: ${width}px;` : '';
 
-		return `<li class="document-table__cell" contenteditable="true" data-table="cell" data-cell-id="${id}" style="${widthStyle}">${text}</li>`;
+		return `<li class="document-table__cell" contenteditable="true" data-table="cell" data-cell-id="${id}" style="${widthStyle} ${styles}">${text}</li>`;
 	}
 
 	getCells(rowIndex) {

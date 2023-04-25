@@ -101,6 +101,18 @@ function localStore(key, value = null) {
 	return true;
 }
 
+function cammelToKebab(str) {
+	return str.replace(/[A-Z]/g, match => `-${match.toLowerCase()}`);
+}
+
+window.kebab = cammelToKebab;
+
+function getInlineStyles(styles) {
+	return Object.keys(styles)
+		.map(key => `${cammelToKebab(key)}: ${styles[key]};`)
+		.join(' ');
+}
+
 export {
 	capitalize,
 	getScrollBarWidth,
@@ -116,4 +128,6 @@ export {
 	getFormatChord,
 	isEqualObjects,
 	localStore,
+	getInlineStyles,
+	cammelToKebab,
 };

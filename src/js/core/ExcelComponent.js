@@ -10,6 +10,8 @@ export default class ExcelComponent extends DomListener {
 		this.store = options.store;
 		this.options = options.options;
 		this.storeSubscribes = options.storeSubscribes || [];
+
+		this.prepare();
 	}
 
 	toHTML() {
@@ -32,6 +34,8 @@ export default class ExcelComponent extends DomListener {
 	isWatching(storeKey) {
 		return this.storeSubscribes.includes(storeKey);
 	}
+
+	prepare() {}
 
 	storeChanged() {}
 

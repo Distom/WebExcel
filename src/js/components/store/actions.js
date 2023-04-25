@@ -1,4 +1,4 @@
-import { TABLE_RESIZE, TEXT_INPUT } from './types';
+import { SET_STYLES, TABLE_RESIZE, TEXT_INPUT } from './types';
 
 export function tableResize(index, value, type) {
 	return {
@@ -17,6 +17,16 @@ export function textInput(id, text) {
 		data: {
 			id,
 			text,
+		},
+	};
+}
+
+export function setStyles(id, styles) {
+	return {
+		type: SET_STYLES,
+		data: {
+			id,
+			styles,
 		},
 	};
 }

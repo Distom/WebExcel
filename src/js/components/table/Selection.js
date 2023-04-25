@@ -17,6 +17,7 @@ export default class Selection {
 		'Enter',
 		'Delete',
 		'Escape',
+		'Backspace',
 		...getCharKeyCodes(),
 	];
 
@@ -48,7 +49,7 @@ export default class Selection {
 			this.#active.delClass(Selection.activeClass);
 		}
 
-		this.table.emit('cell:changed', cell.text());
+		this.table.emit('cell:changed', cell);
 		this.table.emit('table:select', { start: cell });
 
 		this.table.root.focus();
@@ -79,7 +80,12 @@ export default class Selection {
 
 	onPointerdown(event) {
 		const cell = $(event.target).closest('[data-table="cell"]');
-		if (!cell) return;
+
+		if (!cell) {
+			this.table.root.focus();
+			return;
+		}
+
 		if (this.cellFocused && this.active.elem === cell.elem) return;
 
 		event.preventDefault();

@@ -1,5 +1,5 @@
 import ExcelComponent from '../../core/ExcelComponent';
-import { textInput } from '../store/actions';
+import { setStyles, textInput } from '../store/actions';
 import Resizer from './Resizer';
 import Scroll from './Scroll';
 import Selection from './Selection';
@@ -17,7 +17,9 @@ export default class Table extends ExcelComponent {
 			listeners: ['pointerdown', 'pointerup', 'pointermove', 'dblclick', 'keydown', 'input'],
 			...options,
 		});
+	}
 
+	prepare() {
 		this.template = new Template(this, 1000);
 	}
 
@@ -35,6 +37,8 @@ export default class Table extends ExcelComponent {
 			this.dispatch(textInput(this.selection.active.data.cellId, this.selection.active.text()));
 		});
 		this.on('formula:focus-cell', () => this.selection.focusActiveCell());
+		this.on('toolbar:changeStyles', this.updateStyles.bind(this));
+		this.on('toolbar:changeStyles', () => this.root.focus());
 	}
 
 	initHTMLElements() {
@@ -83,5 +87,12 @@ export default class Table extends ExcelComponent {
 
 		this.emit('cell:input', this.selection.active.text());
 		this.dispatch(textInput(cell.data.cellId, this.selection.active.text()));
+	}
+
+	updateStyles(styles) {
+		this.selection.selected.forEach(cell => {
+			cell.css(styles);
+			this.dispatch(setStyles(cell.data.cellId, styles));
+		});
 	}
 }
