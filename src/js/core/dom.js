@@ -6,13 +6,15 @@ class Dom {
 			if (!elem) return {};
 
 			this.elem = elem;
+		} else if ($.check(selector)) {
+			return selector;
 		} else {
 			this.elem = selector;
 		}
 	}
 
 	html(html) {
-		if (typeof html !== 'string') return this.elem.outerHTML.trim();
+		if (typeof html !== 'string') return this.elem.innerHTML;
 		this.elem.innerHTML = html;
 		return this;
 	}
@@ -99,6 +101,14 @@ class Dom {
 		return this;
 	}
 
+	get childs() {
+		return this.elem.childNodes;
+	}
+
+	get prev() {
+		return this.elem.previousSibling;
+	}
+
 	set hidden(value) {
 		this.elem.hidden = value;
 	}
@@ -113,6 +123,18 @@ class Dom {
 
 	get fChild() {
 		return this.elem.firstChild;
+	}
+
+	get lChild() {
+		return this.elem.lastChild;
+	}
+
+	get fElChild() {
+		return $(this.elem.firstElementChild);
+	}
+
+	get lElChild() {
+		return $(this.elem.lastElementChild);
 	}
 
 	get data() {
@@ -190,6 +212,12 @@ export default function $(selector) {
 
 $.create = (tagName, className = '') => {
 	const elem = document.createElement(tagName);
-	elem.className = className;
+	if (className) elem.className = className;
 	return $(elem);
 };
+
+$.check = elem => {
+	return elem instanceof Dom;
+};
+
+$.createText = text => document.createTextNode(text);

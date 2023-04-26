@@ -45,10 +45,10 @@ export default class Toolbar extends ExcelStateComponent {
 		this.emit('toolbar:changeStyles', styles);
 	}
 
-	updateState(cell) {
+	updateState({ newCell }) {
 		const styles = {
 			...initialState,
-			...this.store.getState().cellsState[cell.data.cellId]?.styles,
+			...this.store.getState().cellsState[newCell.data.cellId]?.styles,
 		};
 		this.setState(styles);
 	}

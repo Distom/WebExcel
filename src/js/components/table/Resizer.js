@@ -19,6 +19,13 @@ export default class Resizer {
 		this.table = table;
 		this.minElemSize = minElemSize;
 		this.resizerWidth = $('[data-resizer="col"]').oWidth;
+
+		this.table.on('cell:changed', ({ oldCell, oldCellHeight }) => {
+			if (!oldCell) return;
+
+			const rowIndex = oldCell.data.cellId.split(':')[1];
+			this.updateRowHeight(rowIndex, oldCellHeight);
+		});
 	}
 
 	get resizer() {
@@ -168,6 +175,9 @@ export default class Resizer {
 	updateRowHeight(index, height) {
 		const info = $(this.table.indexesList.children[index]);
 		const row = $(this.table.rowsList.children[index]);
+
+		// to remove unnecessary changes after active cell change
+		if (info.oHeight === height) return;
 
 		info.css({ height: `${height}px` });
 		row.css({ height: `${height}px` });

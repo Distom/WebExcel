@@ -108,7 +108,7 @@
 }
 
 .document-formula {
-	min-height: $row-height;
+	height: $row-height;
 	border-top: 0;
 
 	&__chords {
@@ -120,6 +120,11 @@
 	&__input {
 		flex: 1 1 auto;
 		padding: 3px 15px;
+		height: 100%;
+		max-height: 100%;
+		line-height: 20px;
+		overflow-x: hidden;
+		overflow-y: scroll;
 	}
 
 	&__fx {

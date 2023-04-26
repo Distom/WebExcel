@@ -4,7 +4,6 @@ import Resizer from './Resizer';
 import Scroll from './Scroll';
 import Selection from './Selection';
 import Template from './Template';
-import $ from '../../core/dom';
 
 export default class Table extends ExcelComponent {
 	static className = 'main-document__table document-table';
@@ -14,7 +13,7 @@ export default class Table extends ExcelComponent {
 	constructor(root, options = {}) {
 		super(root, {
 			name: 'Table',
-			listeners: ['pointerdown', 'pointerup', 'pointermove', 'dblclick', 'keydown', 'input'],
+			listeners: ['pointerdown', 'pointerup', 'pointermove', 'dblclick', 'keydown'],
 			...options,
 		});
 	}
@@ -81,13 +80,13 @@ export default class Table extends ExcelComponent {
 		this.selection.onKeydown(event);
 	}
 
-	onInput(event) {
+	/* 	onInput(event) {
 		const cell = $(event.target).closest('[data-table="cell"]');
 		if (!cell) return;
 
-		this.emit('cell:input', this.selection.active.text());
+		this.emit('cell:input', this.selection.active.html());
 		this.dispatch(textInput(cell.data.cellId, this.selection.active.text()));
-	}
+	} */
 
 	updateStyles(styles) {
 		this.selection.selected.forEach(cell => {

@@ -1,6 +1,8 @@
 import { bindAll, getInlineStyles } from '../../core/utils';
 
 export default class Template {
+	// static allowedCellTags = ['<span>', '</span>', '<br>'];
+
 	charCodes = {
 		A: 65,
 		Z: 90,
@@ -51,6 +53,7 @@ export default class Template {
 	getCell(colIndex, rowIndex) {
 		const id = `${colIndex}:${rowIndex}`;
 		const text = this.state.cellsState[id]?.data || '';
+		// text = text ? defuseHTML(text, Template.allowedCellTags) : '';
 
 		let styles = this.state.cellsState[id]?.styles;
 		styles = styles ? getInlineStyles(styles) : '';

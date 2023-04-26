@@ -105,12 +105,38 @@ function cammelToKebab(str) {
 	return str.replace(/[A-Z]/g, match => `-${match.toLowerCase()}`);
 }
 
-window.kebab = cammelToKebab;
-
 function getInlineStyles(styles) {
 	return Object.keys(styles)
 		.map(key => `${cammelToKebab(key)}: ${styles[key]};`)
 		.join(' ');
+}
+
+function getLastTextNode(elem) {
+	const domElem = $(elem);
+	let textNode;
+
+	for (let i = domElem.childs.length - 1; i >= 0; i -= 1) {
+		textNode = domElem.childs[i];
+
+		if (textNode instanceof Text) {
+			return textNode;
+		}
+
+		const subElem = $(domElem.childs[i]);
+
+		for (let j = subElem.childs.length - 1; j >= 0; j -= 1) {
+			textNode = subElem.childs[j];
+			if (textNode instanceof Text) return textNode;
+		}
+	}
+
+	return null;
+}
+
+function defuseHTML(str, allowedTags = []) {
+	return str.replace(/<.+?>/g, match =>
+		allowedTags.includes(match) ? match : `&lt;${match.slice(1, -1)}&gt;`,
+	);
 }
 
 export {
@@ -130,4 +156,6 @@ export {
 	localStore,
 	getInlineStyles,
 	cammelToKebab,
+	getLastTextNode,
+	defuseHTML,
 };
