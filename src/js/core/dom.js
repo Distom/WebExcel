@@ -6,13 +6,15 @@ class Dom {
 			if (!elem) return {};
 
 			this.elem = elem;
+		} else if ($.check(selector)) {
+			return selector;
 		} else {
 			this.elem = selector;
 		}
 	}
 
 	html(html) {
-		if (typeof html !== 'string') return this.elem.outerHTML.trim();
+		if (typeof html !== 'string') return this.elem.innerHTML;
 		this.elem.innerHTML = html;
 		return this;
 	}
@@ -26,6 +28,18 @@ class Dom {
 	append(elem) {
 		const node = elem instanceof Dom ? elem.elem : elem;
 		this.elem.append(node);
+		return this;
+	}
+
+	after(elem) {
+		const node = elem instanceof Dom ? elem.elem : elem;
+		this.elem.after(node);
+		return this;
+	}
+
+	before(elem) {
+		const node = elem instanceof Dom ? elem.elem : elem;
+		this.elem.before(node);
 		return this;
 	}
 
@@ -69,8 +83,19 @@ class Dom {
 		return $(this.elem.querySelector(selector));
 	}
 
-	css(styles = {}) {
-		Object.keys(styles).forEach(prop => (this.elem.style[prop] = styles[prop]));
+	css(styles) {
+		if (styles) {
+			if (typeof styles === 'string') {
+				this.elem.style.cssText = styles;
+			} else if (typeof styles === 'object') {
+				Object.keys(styles).forEach(prop => (this.elem.style[prop] = styles[prop]));
+			}
+		}
+
+		if (arguments.length === 0) {
+			return this.elem.style.cssText;
+		}
+
 		return this;
 	}
 
@@ -99,6 +124,51 @@ class Dom {
 		return this;
 	}
 
+	insertHTML(...args) {
+		this.elem.insertAdjacentHTML(...args);
+		return this;
+	}
+
+	clone(...args) {
+		return $(this.elem.cloneNode(...args));
+	}
+
+	replaceWith(...args) {
+		return this.elem.replaceWith(...args);
+	}
+
+	get parentNode() {
+		return $(this.elem.parentNode);
+	}
+
+	get parentElem() {
+		return $(this.elem.parentElement);
+	}
+
+	get nodeValue() {
+		return this.elem.nodeValue;
+	}
+
+	get childs() {
+		return this.elem.childNodes;
+	}
+
+	get prev() {
+		return this.elem.previousSibling;
+	}
+
+	get next() {
+		return this.elem.nextSibling;
+	}
+
+	get prevElem() {
+		return $(this.elem.previousElementSibling);
+	}
+
+	get nextElem() {
+		return $(this.elem.nextElementSibling);
+	}
+
 	set hidden(value) {
 		this.elem.hidden = value;
 	}
@@ -115,8 +185,24 @@ class Dom {
 		return this.elem.firstChild;
 	}
 
+	get lChild() {
+		return this.elem.lastChild;
+	}
+
+	get fElChild() {
+		return $(this.elem.firstElementChild);
+	}
+
+	get lElChild() {
+		return $(this.elem.lastElementChild);
+	}
+
 	get data() {
 		return this.elem.dataset;
+	}
+
+	get tag() {
+		return this.elem.tagName;
 	}
 
 	get children() {
@@ -190,6 +276,12 @@ export default function $(selector) {
 
 $.create = (tagName, className = '') => {
 	const elem = document.createElement(tagName);
-	elem.className = className;
+	if (className) elem.className = className;
 	return $(elem);
 };
+
+$.check = elem => {
+	return elem instanceof Dom;
+};
+
+$.createText = text => document.createTextNode(text);

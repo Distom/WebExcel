@@ -1,16 +1,10 @@
 import { bindAll, updateCssPropertyScrollBarWidth } from '../../core/utils';
 
 export default class Scroll {
-	static instance;
-
 	constructor(table) {
-		if (Scroll.instance) return Scroll.instance;
-
 		this.table = table;
 		bindAll(this);
 		this.init();
-
-		Scroll.instance = this;
 	}
 
 	init() {

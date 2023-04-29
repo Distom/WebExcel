@@ -1,5 +1,12 @@
 import $ from '../../core/dom';
-import { cellChords, getLetterKeyCodes, getScrollBarWidth, getRange } from '../../core/utils';
+import {
+	cellChords,
+	getScrollBarWidth,
+	getRange,
+	getCharKeyCodes,
+	getLastTextNode,
+} from '../../core/utils';
+import { textInput } from '../../store/actions';
 
 let scrollBarWidth = getScrollBarWidth();
 
@@ -7,8 +14,6 @@ export default class Selection {
 	static activeClass = 'active';
 
 	static selectedClass = 'selected';
-
-	static instance;
 
 	static navigationKeys = [
 		'ArrowUp',
@@ -19,7 +24,8 @@ export default class Selection {
 		'Enter',
 		'Delete',
 		'Escape',
-		...getLetterKeyCodes(),
+		'Backspace',
+		...getCharKeyCodes(),
 	];
 
 	#active;
@@ -31,8 +37,6 @@ export default class Selection {
 	selected = [];
 
 	constructor(table) {
-		if (Selection.instance) return Selection.instance;
-
 		this.table = table;
 
 		this.selectionObserver = new MutationObserver(this.observeSelection.bind(this));
@@ -42,9 +46,9 @@ export default class Selection {
 			attributeFilter: ['class'],
 		});
 
-		this.active = this.table.root.select('[data-cell-id="0:0"]');
+		// setInterval(() => console.log(window.getSelection()), 1000);
 
-		Selection.instance = this;
+		this.active = this.table.root.select('[data-cell-id="0:0"]');
 	}
 
 	set active(cell) {
@@ -54,14 +58,28 @@ export default class Selection {
 			this.#active.delClass(Selection.activeClass);
 		}
 
-		this.table.emit('cell:changed', cell.text());
+		this.table.emit('cell:changed', {
+			newCell: cell,
+			oldCell: this.#active,
+			oldCellHeight: this.#active?.oHeight,
+		});
 		this.table.emit('table:select', { start: cell });
 
+		window.getSelection().removeAllRanges();
 		this.table.root.focus();
 		this.clearSelected();
 		this.selected.push(cell);
 		this.lastSelected = cell;
 		this.#active = cell.addClass(Selection.activeClass);
+
+		this.activeObserver = new MutationObserver(() => {
+			// const clearHTML = defuseHTML(cell.html(), Template.allowedCellTags);
+			const clearHTML = cell.html();
+			this.table.emit('cell:input', clearHTML);
+			this.table.dispatch(textInput(cell.data.cellId, clearHTML));
+		});
+
+		this.activeObserver.observe(cell.elem, { childList: true, subtree: true, characterData: true });
 	}
 
 	get active() {
@@ -85,7 +103,12 @@ export default class Selection {
 
 	onPointerdown(event) {
 		const cell = $(event.target).closest('[data-table="cell"]');
-		if (!cell) return;
+
+		if (!cell) {
+			this.table.root.focus();
+			return;
+		}
+
 		if (this.cellFocused && this.active.elem === cell.elem) return;
 
 		event.preventDefault();
@@ -97,6 +120,7 @@ export default class Selection {
 			this.active = cell;
 		}
 
+		// update scrollBarWidth for autoscroll
 		scrollBarWidth = getScrollBarWidth();
 
 		this.selectionActive = true;
@@ -123,13 +147,13 @@ export default class Selection {
 	}
 
 	focusActiveCell() {
-		const textNode = this.active.fChild;
+		const textNode = getLastTextNode(this.active);
 
 		if (textNode) {
 			const range = document.createRange();
 			const sel = window.getSelection();
 
-			range.setStart(textNode, this.active.text().length);
+			range.setStart(textNode, textNode.nodeValue.length);
 			range.collapse(true);
 
 			sel.removeAllRanges();
@@ -149,6 +173,68 @@ export default class Selection {
 				case 'Enter':
 					event.preventDefault();
 
+					if (event.ctrlKey) {
+						const sel = window.getSelection();
+						const cursor = sel.anchorOffset;
+						const br = $.create('br').elem;
+
+						let rangeNode;
+						let rangeOffset;
+						let addOneToRangeOffset = false;
+						const textNode = sel.anchorNode;
+
+						if (!(textNode instanceof Text)) {
+							const cursorNode = textNode.childNodes[cursor];
+
+							if (!cursorNode) {
+								textNode.append(br.cloneNode());
+								textNode.append(br);
+								rangeOffset = 2;
+							} else {
+								cursorNode.after(br);
+								rangeOffset = cursor + 1;
+							}
+
+							rangeNode = textNode;
+						} else {
+							const textNodeText = textNode.nodeValue;
+							const textNodeParent = textNode.parentElement;
+							const wrapper = new DocumentFragment();
+
+							wrapper.append(textNodeText.slice(0, cursor));
+							wrapper.append(br);
+
+							const afterText = textNodeText.slice(cursor);
+
+							if (!textNode.nextSibling) {
+								// if cursor is at the end of the text add another <br> to make the transition to a new line be working
+								wrapper.append(afterText || br.cloneNode());
+							} else {
+								wrapper.append(afterText || '');
+								addOneToRangeOffset = true;
+							}
+
+							textNodeParent.replaceChild(wrapper, textNode);
+
+							if (afterText) {
+								rangeNode = br.nextSibling;
+								rangeOffset = 0;
+							} else {
+								rangeNode = textNodeParent;
+								rangeOffset = Array.from(rangeNode.childNodes).indexOf(br) + 1;
+								rangeOffset = addOneToRangeOffset ? rangeOffset + 1 : rangeOffset;
+							}
+						}
+
+						const range = document.createRange();
+						range.setStart(rangeNode, rangeOffset);
+						range.collapse(true);
+						sel.removeAllRanges();
+						sel.addRange(range);
+
+						return;
+					}
+
 					if (event.shiftKey) {
 						row -= 1;
 					} else {
@@ -158,14 +244,15 @@ export default class Selection {
 
 				case 'Escape':
 					event.preventDefault();
+					this.active.html('');
 					this.table.root.focus();
 					return;
 
 				// no default
 			}
 		} else {
-			if (getLetterKeyCodes().includes(event.code)) {
-				this.active.text('');
+			if (getCharKeyCodes().includes(event.code)) {
+				this.active.html('');
 				this.focusActiveCell();
 				this.clearSelected();
 				this.selected.push(this.active);
@@ -201,9 +288,14 @@ export default class Selection {
 					return;
 
 				case 'Delete':
+				case 'Backspace':
 					event.preventDefault();
-					this.active.text('');
-					this.table.emit('cell:input', this.active.text());
+
+					this.selected.forEach(cell => {
+						cell.html('');
+						this.table.dispatch(textInput(cell.data.cellId, ''));
+					});
+
 					return;
 
 				// no default
@@ -231,6 +323,7 @@ export default class Selection {
 		row = Math.min(this.table.template.rowsCount - 1, row);
 
 		const nextCell = this.table.root.select(`[data-cell-id="${col}:${row}"]`);
+		if (nextCell.elem === this.active.elem) return;
 
 		this.scrollToCell(nextCell);
 

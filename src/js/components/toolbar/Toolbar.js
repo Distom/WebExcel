@@ -1,6 +1,9 @@
-import ExcelComponent from '../../core/ExcelComponent';
+import ExcelStateComponent from '../../core/ExcelStateComponent';
+import $ from '../../core/dom';
+import Template from './Template';
+import initialState from './initialState';
 
-export default class Toolbar extends ExcelComponent {
+export default class Toolbar extends ExcelStateComponent {
 	static className = 'main-document__toolbar document-toolbar';
 
 	static tagName = 'section';
@@ -8,51 +11,45 @@ export default class Toolbar extends ExcelComponent {
 	constructor(root, options = {}) {
 		super(root, {
 			name: 'Toolbar',
+			listeners: ['click'],
 			...options,
 		});
 	}
 
+	init() {
+		super.init();
+
+		this.on('cell:changed', this.updateState.bind(this));
+	}
+
+	prepare() {
+		this.initState(initialState);
+		this.template = new Template(this);
+	}
+
+	get stateTemplate() {
+		return this.template.createToolbar();
+	}
+
 	toHTML() {
-		return `
-		<ul class="document-toolbar__container">
-					<li class="document-toolbar__buttons-block toolbar-buttons-block">
-						<ul class="toolbar-buttons-block__buttons">
-							<li class="toolbar-buttons-block__button-wrapper">
-								<button class="toolbar-buttons-block__button button">
-									<i class="toolbar-buttons-block__button-icon material-icons">format_bold</i>
-								</button>
-							</li>
-							<li class="toolbar-buttons-block__button-wrapper">
-								<button class="toolbar-buttons-block__button button">
-									<i class="toolbar-buttons-block__button-icon material-icons">format_italic</i>
-								</button>
-							</li>
-							<li class="toolbar-buttons-block__button-wrapper">
-								<button class="toolbar-buttons-block__button button">
-									<i class="toolbar-buttons-block__button-icon material-icons">format_underlined</i>
-								</button>
-							</li>
-						</ul>
-					</li>
-					<li class="document-toolbar__buttons-block toolbar-buttons-block">
-						<ul class="toolbar-buttons-block__buttons">
-							<li class="toolbar-buttons-block__button-wrapper">
-								<button class="toolbar-buttons-block__button button">
-									<i class="toolbar-buttons-block__button-icon material-icons">format_align_left</i>
-								</button>
-							</li>
-							<li class="toolbar-buttons-block__button-wrapper">
-								<button class="toolbar-buttons-block__button button">
-									<i class="toolbar-buttons-block__button-icon material-icons">format_align_center</i>
-								</button>
-							</li>
-							<li class="toolbar-buttons-block__button-wrapper">
-								<button class="toolbar-buttons-block__button button">
-									<i class="toolbar-buttons-block__button-icon material-icons">format_align_right</i>
-								</button>
-							</li>
-						</ul>
-					</li>
-				</ul>`;
+		return this.stateTemplate;
+	}
+
+	onClick(event) {
+		const button = $(event.target).closest('[data-type="button"]');
+		if (!button) return;
+
+		const styles = JSON.parse(button.data.value);
+
+		this.setState(styles);
+		this.emit('toolbar:changeStyles', styles);
+	}
+
+	updateState({ newCell }) {
+		const styles = {
+			...initialState,
+			...this.store.getState().cellsState[newCell.data.cellId]?.styles,
+		};
+		this.setState(styles);
 	}
 }

@@ -20,7 +20,7 @@ export default class Formula extends ExcelComponent {
 		bindAll(this);
 
 		this.on('cell:input', this.setInputText);
-		this.on('cell:changed', this.setInputText);
+		this.on('cell:changed', ({ newCell }) => this.setInputText(newCell.html()));
 		this.on('table:select', this.updateChords);
 	}
 
@@ -32,7 +32,8 @@ export default class Formula extends ExcelComponent {
 	}
 
 	setInputText(text) {
-		this.input.text(text);
+		this.input.html(text);
+		// this.input.html(text.replace(/<\/?span>/g, ''));
 	}
 
 	updateChords({ start, end }) {
