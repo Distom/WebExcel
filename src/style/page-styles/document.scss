@@ -284,7 +284,10 @@
 
 	&__row {
 		display: flex;
-		margin-right: $cell-width;
+		// work in chrome
+		// margin-right: $cell-width;
+		// work in chrome and firefox
+		padding-right: $cell-width;
 		width: fit-content;
 	}
 
@@ -333,6 +336,7 @@
 		background: #fff;
 		padding: 5px;
 		cursor: default;
+		word-wrap: break-word;
 
 		&:focus {
 			cursor: text;
