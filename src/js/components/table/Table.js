@@ -37,7 +37,8 @@ export default class Table extends ExcelComponent {
 		});
 		this.on('formula:focus-cell', () => this.selection.focusActiveCell());
 		this.on('toolbar:changeStyles', this.updateStyles.bind(this));
-		this.on('toolbar:changeStyles', () => this.root.focus());
+		// this.on('toolbar:changeStyles', () => this.root.focus());
+		// setInterval(() => console.log(window.getSelection()), 300);
 	}
 
 	initHTMLElements() {
@@ -89,9 +90,20 @@ export default class Table extends ExcelComponent {
 	} */
 
 	updateStyles(styles) {
-		this.selection.selected.forEach(cell => {
-			cell.css(styles);
-			this.dispatch(setStyles(cell.data.cellId, styles));
-		});
+		// this.selection.selected.forEach(cell => {
+		// 	cell.css(styles);
+		// 	this.dispatch(setStyles(cell.data.cellId, styles));
+		// });
+
+		const sel = window.getSelection();
+		if (sel.type === 'None') {
+			this.selection.selected.forEach(cell => {
+				cell.css(styles);
+				this.dispatch(setStyles(cell.data.cellId, styles));
+			});
+			this.root.focus();
+		} else {
+			console.log('Text selected');
+		}
 	}
 }

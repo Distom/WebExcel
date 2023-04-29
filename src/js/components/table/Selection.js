@@ -65,6 +65,7 @@ export default class Selection {
 		});
 		this.table.emit('table:select', { start: cell });
 
+		window.getSelection().removeAllRanges();
 		this.table.root.focus();
 		this.clearSelected();
 		this.selected.push(cell);
@@ -119,6 +120,7 @@ export default class Selection {
 			this.active = cell;
 		}
 
+		// update scrollBarWidth for autoscroll
 		scrollBarWidth = getScrollBarWidth();
 
 		this.selectionActive = true;
@@ -173,10 +175,12 @@ export default class Selection {
 
 					if (event.ctrlKey) {
 						const sel = window.getSelection();
-						const cursor = sel.extentOffset;
+						const cursor = sel.anchorOffset;
 						const br = $.create('br').elem;
+
 						let rangeNode;
 						let rangeOffset;
+						let addOneToRangeOffset = false;
 						const textNode = sel.anchorNode;
 
 						if (!(textNode instanceof Text)) {
@@ -207,6 +211,7 @@ export default class Selection {
 								wrapper.append(afterText || br.cloneNode());
 							} else {
 								wrapper.append(afterText || '');
+								addOneToRangeOffset = true;
 							}
 
 							textNodeParent.replaceChild(wrapper, textNode);
@@ -217,6 +222,7 @@ export default class Selection {
 							} else {
 								rangeNode = textNodeParent;
 								rangeOffset = Array.from(rangeNode.childNodes).indexOf(br) + 1;
+								rangeOffset = addOneToRangeOffset ? rangeOffset + 1 : rangeOffset;
 							}
 						}
 
@@ -317,6 +323,7 @@ export default class Selection {
 		row = Math.min(this.table.template.rowsCount - 1, row);
 
 		const nextCell = this.table.root.select(`[data-cell-id="${col}:${row}"]`);
+		if (nextCell.elem === this.active.elem) return;
 
 		this.scrollToCell(nextCell);
 
