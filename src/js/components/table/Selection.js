@@ -46,8 +46,6 @@ export default class Selection {
 			attributeFilter: ['class'],
 		});
 
-		// setInterval(() => console.log(window.getSelection()), 1000);
-
 		this.active = this.table.root.select('[data-cell-id="0:0"]');
 	}
 
