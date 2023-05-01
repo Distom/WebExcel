@@ -1,7 +1,8 @@
+import mathParser from '../../core/mathParser';
 import { bindAll, getInlineStyles } from '../../core/utils';
 
 export default class Template {
-	// static allowedCellTags = ['<span>', '</span>', '<br>'];
+	static allowedCellTags = ['span', 'br'];
 
 	charCodes = {
 		A: 65,
@@ -61,7 +62,9 @@ export default class Template {
 		const width = this.state.colsState[colIndex];
 		const widthStyle = width ? `width: ${width}px;` : '';
 
-		return `<li class="document-table__cell" contenteditable="true" data-table="cell" data-cell-id="${id}" style="${widthStyle} ${styles}">${text}</li>`;
+		return `<li class="document-table__cell" contenteditable="true" data-table="cell" data-cell-id="${id}" data-content='${text}' style="${widthStyle} ${styles}">${mathParser(
+			text,
+		)}</li>`;
 	}
 
 	getCells(rowIndex) {

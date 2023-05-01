@@ -1,10 +1,13 @@
+import Template from './Template';
 import $ from '../../core/dom';
+import mathParser from '../../core/mathParser';
 import {
 	cellChords,
 	getScrollBarWidth,
 	getRange,
 	getCharKeyCodes,
 	getLastTextNode,
+	defuseHTML,
 } from '../../core/utils';
 import { textInput } from '../../store/actions';
 
@@ -32,6 +35,8 @@ export default class Selection {
 
 	#lastSelected;
 
+	isFormulaMode = false;
+
 	selectionActive = false;
 
 	selected = [];
@@ -54,6 +59,8 @@ export default class Selection {
 
 		if (this.#active) {
 			this.#active.delClass(Selection.activeClass);
+			this.activeObserver.disconnect();
+			this.#active.html(mathParser(this.#active.data.content));
 		}
 
 		this.table.emit('cell:changed', {
@@ -62,6 +69,8 @@ export default class Selection {
 			oldCellHeight: this.#active?.oHeight,
 		});
 		this.table.emit('table:select', { start: cell });
+
+		this.addSelectionRect(cell);
 
 		window.getSelection().removeAllRanges();
 		this.table.root.focus();
@@ -73,7 +82,9 @@ export default class Selection {
 		this.activeObserver = new MutationObserver(() => {
 			// const clearHTML = defuseHTML(cell.html(), Template.allowedCellTags);
 			const clearHTML = cell.html();
+			this.isFormulaMode = clearHTML.startsWith('=');
 			this.table.emit('cell:input', clearHTML);
+			cell.data.content = clearHTML;
 			this.table.dispatch(textInput(cell.data.cellId, clearHTML));
 		});
 
@@ -109,6 +120,7 @@ export default class Selection {
 
 		if (this.cellFocused && this.active.elem === cell.elem) return;
 
+		this.removeSelectionRect();
 		event.preventDefault();
 		event.target.setPointerCapture(event.pointerId);
 
@@ -127,6 +139,7 @@ export default class Selection {
 	onPointermove(event) {
 		if (!this.selectionActive) return;
 
+		this.removeSelectionRect();
 		const hoveredElem = document.elementFromPoint(event.pageX, event.pageY);
 		if (!hoveredElem) return;
 
@@ -137,6 +150,7 @@ export default class Selection {
 	}
 
 	onPointerup() {
+		if (this.selectionActive) this.addSelectionRect();
 		this.selectionActive = false;
 	}
 
@@ -145,6 +159,8 @@ export default class Selection {
 	}
 
 	focusActiveCell() {
+		this.removeSelectionRect();
+		this.active.html(this.active.data.content);
 		const textNode = getLastTextNode(this.active);
 
 		if (textNode) {
@@ -242,7 +258,7 @@ export default class Selection {
 
 				case 'Escape':
 					event.preventDefault();
-					this.active.html('');
+					this.clearCell(this.active);
 					this.table.root.focus();
 					return;
 
@@ -250,7 +266,7 @@ export default class Selection {
 			}
 		} else {
 			if (getCharKeyCodes().includes(event.code)) {
-				this.active.html('');
+				this.clearCell(this.active);
 				this.focusActiveCell();
 				this.clearSelected();
 				this.selected.push(this.active);
@@ -290,7 +306,7 @@ export default class Selection {
 					event.preventDefault();
 
 					this.selected.forEach(cell => {
-						cell.html('');
+						this.clearCell(cell);
 						this.table.dispatch(textInput(cell.data.cellId, ''));
 					});
 
@@ -404,6 +420,11 @@ export default class Selection {
 		this.lastSelected = null;
 	}
 
+	clearCell(cell) {
+		cell.data.content = '';
+		cell.html('');
+	}
+
 	observeSelection(mutations) {
 		mutations.forEach(mutation => {
 			const cell = $(mutation.target).closest('[data-table="cell"]');
@@ -421,5 +442,40 @@ export default class Selection {
 				info.delClass(Selection.selectedClass);
 			}
 		});
+	}
+
+	addSelectionRect(elem) {
+		this.removeSelectionRect();
+
+		this.selectionRect = $.create('div', 'selection-rect');
+		this.selectionCircle = $.create('div', 'selection-rect__circle');
+
+		let startCell = this.selected[0];
+		let endCell = this.selected[this.selected.length - 1];
+
+		if (elem) {
+			startCell = elem;
+			endCell = elem;
+		}
+
+		const top = startCell.top - this.table.header.bottom + this.table.body.scrollY;
+		const left = startCell.left - this.table.rows.left + this.table.rows.scrollX;
+		const height = endCell.bottom - this.table.header.bottom + this.table.body.scrollY - top;
+		const width = endCell.right - this.table.rows.left + this.table.rows.scrollX - left;
+
+		this.selectionRect.css({
+			top: `${top - 1}px`,
+			left: `${left - 1}px`,
+			height: `${height + 1}px`,
+			width: `${width + 1}px`,
+		});
+
+		this.selectionRect.append(this.selectionCircle);
+		this.table.rows.append(this.selectionRect);
+	}
+
+	removeSelectionRect() {
+		if (!this.selectionRect) return;
+		this.selectionRect.remove();
 	}
 }

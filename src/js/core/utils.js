@@ -30,7 +30,7 @@ function updateCssPropertyScrollBarWidth() {
 function bindAll(obj) {
 	const prototype = Object.getPrototypeOf(obj);
 	Object.getOwnPropertyNames(prototype).forEach(key => {
-		if (key === 'constructor') return;
+		if (key === 'constructor' || typeof obj[key] !== 'function') return;
 		obj[key] = obj[key].bind(obj);
 	});
 }

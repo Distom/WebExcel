@@ -14,13 +14,19 @@ export default class Formula extends ExcelComponent {
 		});
 	}
 
+	get focused() {
+		return !!window.document.activeElement.closest('[data-formula="input"]');
+	}
+
 	init() {
 		super.init();
 		this.initHTMLElements();
 		bindAll(this);
 
-		this.on('cell:input', this.setInputText);
-		this.on('cell:changed', ({ newCell }) => this.setInputText(newCell.html()));
+		this.on('cell:input', value => {
+			if (!this.focused) this.setInputText(value);
+		});
+		this.on('cell:changed', ({ newCell }) => this.setInputText(newCell.data.content));
 		this.on('table:select', this.updateChords);
 	}
 
@@ -33,7 +39,6 @@ export default class Formula extends ExcelComponent {
 
 	setInputText(text) {
 		this.input.html(text);
-		// this.input.html(text.replace(/<\/?span>/g, ''));
 	}
 
 	updateChords({ start, end }) {

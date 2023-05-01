@@ -31,6 +31,7 @@ export default class Table extends ExcelComponent {
 		this.scroll = new Scroll(this);
 		this.resizer = new Resizer(this, 7);
 		this.selection = new Selection(this);
+		this.selection.addSelectionRect();
 
 		this.on('formula:input', text => {
 			this.selection.active.text(text);

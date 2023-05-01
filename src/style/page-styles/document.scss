@@ -125,6 +125,12 @@
 		line-height: 20px;
 		overflow-x: hidden;
 		overflow-y: scroll;
+
+		& * {
+			font-weight: normal !important;
+			text-decoration: none !important;
+			font-style: normal !important;
+		}
 	}
 
 	&__fx {
@@ -280,6 +286,7 @@
 		flex: 1 1 auto;
 		overflow-x: scroll;
 		overflow-y: hidden;
+		position: relative;
 	}
 
 	&__row {

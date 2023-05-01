@@ -20,3 +20,23 @@
 		font-size: 20px;
 	}
 }
+
+.selection-rect {
+	background: transparent;
+	border: 1px solid $selected-border-color;
+	position: absolute;
+	z-index: 10;
+	pointer-events: none;
+
+	&__circle {
+		position: absolute;
+		right: -5px;
+		bottom: -5px;
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: $selected-border-color;
+		border: 1px solid #fff;
+		pointer-events: auto;
+	}
+}
