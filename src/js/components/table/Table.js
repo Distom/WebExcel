@@ -1,6 +1,7 @@
 import ExcelComponent from '../../core/ExcelComponent';
 import $ from '../../core/dom';
 import { setStyles, textInput } from '../../store/actions';
+import FormulaSelection from './FormulaSelection';
 import Resizer from './Resizer';
 import Scroll from './Scroll';
 import Selection from './Selection';
@@ -20,7 +21,7 @@ export default class Table extends ExcelComponent {
 	}
 
 	prepare() {
-		this.template = new Template(this, 1000);
+		this.template = new Template(this, 30);
 	}
 
 	init() {
@@ -31,7 +32,8 @@ export default class Table extends ExcelComponent {
 		this.scroll = new Scroll(this);
 		this.resizer = new Resizer(this, 7);
 		this.selection = new Selection(this);
-		this.selection.addSelectionRect();
+		this.formulaSelection = new FormulaSelection(this);
+		this.formulaSelection.addSelectionRect();
 
 		this.on('formula:input', text => {
 			this.selection.active.text(text);
@@ -61,6 +63,7 @@ export default class Table extends ExcelComponent {
 	onPointerdown(event) {
 		this.resizer.onPointerdown(event);
 		this.selection.onPointerdown(event);
+		this.formulaSelection.onPointerdown(event);
 	}
 
 	onPointermove(event) {

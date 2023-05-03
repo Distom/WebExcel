@@ -207,7 +207,6 @@
 			}
 
 			&::before {
-
 				height: 100%;
 				width: 5px;
 				top: 0;
@@ -215,12 +214,10 @@
 			}
 
 			&::after {
-
 				top: calc(($resizer-width - $row-height) / 2);
 				left: 3px;
 				width: 3px;
 				height: 100vh;
-
 			}
 		}
 
@@ -314,6 +311,8 @@
 		flex: 0 0 $row-height;
 		min-width: fit-content;
 		padding-left: $info-cell-width;
+		// column resizer fix
+		z-index: 1;
 	}
 
 	&__body {

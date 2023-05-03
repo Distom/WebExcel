@@ -1,5 +1,5 @@
 import mathParser from '../../core/mathParser';
-import { bindAll, getInlineStyles } from '../../core/utils';
+import { bindAll, defuseHTML, getInlineStyles } from '../../core/utils';
 
 export default class Template {
 	static allowedCellTags = ['span', 'br'];
@@ -53,8 +53,9 @@ export default class Template {
 
 	getCell(colIndex, rowIndex) {
 		const id = `${colIndex}:${rowIndex}`;
-		const text = this.state.cellsState[id]?.data || '';
-		// text = text ? defuseHTML(text, Template.allowedCellTags) : '';
+
+		let text = this.state.cellsState[id]?.data || '';
+		text = text ? defuseHTML(text, Template.allowedCellTags) : '';
 
 		let styles = this.state.cellsState[id]?.styles;
 		styles = styles ? getInlineStyles(styles) : '';
@@ -85,6 +86,18 @@ export default class Template {
 	}
 
 	getRows() {
+		let rows = `<div class="document-table__rows" data-table="rows">
+			<ul class="document-table__rows-list" data-table-role="rows-list">`;
+
+		rows += new Array(this.rowsCount)
+			.fill('')
+			.map((_, index) => this.getRow(index))
+			.join('');
+
+		return `${rows}</ul></div>`;
+	}
+
+	/* getRows() {
 		let rows = '<ul class="document-table__rows" data-table="rows" data-table-role="rows-list">';
 
 		rows += new Array(this.rowsCount)
@@ -93,7 +106,7 @@ export default class Template {
 			.join('');
 
 		return `${rows}</ul>`;
-	}
+	} */
 
 	getBody() {
 		let body = '<div class="document-table__body" data-table="body">';

@@ -169,6 +169,7 @@ export default class Resizer {
 			.map(row => $(row).select('[data-table-role="cells-list"]').children[index])
 			.forEach(cell => $(cell).css({ width: `${width}px` }));
 
+		this.table.formulaSelection.addSelectionRect();
 		this.table.dispatch(tableResize(index, width, 'col'));
 	}
 
@@ -182,6 +183,7 @@ export default class Resizer {
 		info.css({ height: `${height}px` });
 		row.css({ height: `${height}px` });
 
+		this.table.formulaSelection.addSelectionRect();
 		this.table.dispatch(tableResize(index, height, 'row'));
 	}
 }

@@ -134,9 +134,10 @@ function getLastTextNode(elem) {
 }
 
 function defuseHTML(str, allowedTags = []) {
-	return str.replace(/<.+?>/g, match =>
-		allowedTags.includes(match) ? match : `&lt;${match.slice(1, -1)}&gt;`,
-	);
+	return str.replace(/<.+?>/g, match => {
+		const tagName = match.replace(/<|>|\//g, '').split(' ')[0];
+		return allowedTags.includes(tagName) ? match : `&lt;${match.slice(1, -1)}&gt;`;
+	});
 }
 
 export {
