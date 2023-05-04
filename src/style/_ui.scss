@@ -40,3 +40,13 @@
 		pointer-events: auto;
 	}
 }
+
+.formula-rect {
+	background: transparent;
+	border: 1px dashed black;
+	position: absolute;
+	z-index: 9;
+	pointer-events: none;
+	width: 0px;
+	height: 0px;
+}

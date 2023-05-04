@@ -148,7 +148,7 @@ export default class Selection {
 		const lastSelected = $(hoveredElem).closest('[data-table="cell"]');
 		this.selectGroup(lastSelected);
 
-		this.scrollRows(event);
+		this.table.scrollRows(event, scrollBarWidth);
 	}
 
 	onPointerup() {
@@ -333,7 +333,6 @@ export default class Selection {
 		// this.active.html(defuseHTML(this.active.data.content, Template.allowedCellTags));
 		this.setCellHTML(this.active, this.active.data.content);
 		// this.active.html(this.active.data.content);
-		console.log('focus');
 		const textNode = getLastTextNode(this.active);
 
 		if (textNode) {
@@ -352,27 +351,6 @@ export default class Selection {
 
 	setCellHTML(cell, html) {
 		cell.html(defuseHTML(html, Template.allowedCellTags));
-	}
-
-	scrollRows(event) {
-		const scrollStep = 5;
-
-		const scrollBarLeft = this.table.root.oWidth - scrollBarWidth;
-		const scrollBarTop = this.table.root.oHeight + this.table.root.top - scrollBarWidth;
-		const scrollBarRight = this.table.info.oWidth;
-		const scrollBarBottom = this.table.root.top + this.table.header.oHeight;
-
-		if (event.pageX >= scrollBarLeft) {
-			this.table.rows.scrollBy({ left: scrollStep });
-		} else if (event.pageX <= scrollBarRight) {
-			this.table.rows.scrollBy({ left: -scrollStep });
-		}
-
-		if (event.pageY >= scrollBarTop) {
-			this.table.body.scrollBy({ top: scrollStep });
-		} else if (event.pageY <= scrollBarBottom) {
-			this.table.body.scrollBy({ top: -scrollStep });
-		}
 	}
 
 	scrollToCell(cell) {

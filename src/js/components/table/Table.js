@@ -69,11 +69,13 @@ export default class Table extends ExcelComponent {
 	onPointermove(event) {
 		this.resizer.onPointermove(event);
 		this.selection.onPointermove(event);
+		this.formulaSelection.onPointermove(event);
 	}
 
 	onPointerup(event) {
 		this.resizer.onPointerup(event);
 		this.selection.onPointerup(event);
+		this.formulaSelection.onPointerup(event);
 	}
 
 	onDblclick(event) {
@@ -82,6 +84,27 @@ export default class Table extends ExcelComponent {
 
 	onKeydown(event) {
 		this.selection.onKeydown(event);
+	}
+
+	scrollRows(event, scrollBarWidth) {
+		const scrollStep = 5;
+
+		const scrollBarLeft = this.root.oWidth - scrollBarWidth;
+		const scrollBarTop = this.root.oHeight + this.root.top - scrollBarWidth;
+		const scrollBarRight = this.info.oWidth;
+		const scrollBarBottom = this.root.top + this.header.oHeight;
+
+		if (event.pageX >= scrollBarLeft) {
+			this.rows.scrollBy({ left: scrollStep });
+		} else if (event.pageX <= scrollBarRight) {
+			this.rows.scrollBy({ left: -scrollStep });
+		}
+
+		if (event.pageY >= scrollBarTop) {
+			this.body.scrollBy({ top: scrollStep });
+		} else if (event.pageY <= scrollBarBottom) {
+			this.body.scrollBy({ top: -scrollStep });
+		}
 	}
 
 	updateStyles(styles) {
