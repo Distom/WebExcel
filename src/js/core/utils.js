@@ -105,6 +105,10 @@ function cammelToKebab(str) {
 	return str.replace(/[A-Z]/g, match => `-${match.toLowerCase()}`);
 }
 
+function kebabToCammel(str) {
+	return str.replace(/-\w/g, match => `${match.slice(1).toUpperCase()}`);
+}
+
 function getInlineStyles(styles) {
 	return Object.keys(styles)
 		.map(key => `${cammelToKebab(key)}: ${styles[key]};`)
@@ -140,6 +144,19 @@ function defuseHTML(str, allowedTags = []) {
 	});
 }
 
+function parseStyles(stylesStr) {
+	const styles = {};
+
+	stylesStr.split(';').forEach(style => {
+		const [prop, value] = style.split(':');
+		if (!prop) return;
+
+		styles[kebabToCammel(prop.trim())] = value.trim();
+	});
+
+	return styles;
+}
+
 export {
 	capitalize,
 	getScrollBarWidth,
@@ -159,4 +176,6 @@ export {
 	cammelToKebab,
 	getLastTextNode,
 	defuseHTML,
+	parseStyles,
+	kebabToCammel,
 };

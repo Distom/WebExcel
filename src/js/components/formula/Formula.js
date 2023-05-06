@@ -42,20 +42,10 @@ export default class Formula extends ExcelComponent {
 	}
 
 	updateChords({ start, end }) {
-		let startChordText = this.startChord.text();
-		let endChordText = this.startChord.text();
+		this.startChord.text(getFormatChord(start));
+		this.endChord.text(getFormatChord(end));
 
-		if (start) {
-			startChordText = getFormatChord(start);
-			this.startChord.text(startChordText);
-		}
-
-		if (end) {
-			endChordText = getFormatChord(end);
-			this.endChord.text(endChordText);
-		}
-
-		if (startChordText === endChordText) {
+		if (start.elem === end.elem) {
 			this.endChord.elem.hidden = true;
 			this.chordsDouble.elem.hidden = true;
 		} else {

@@ -1,5 +1,6 @@
 import ExcelComponent from '../../core/ExcelComponent';
 import $ from '../../core/dom';
+import { cellChords, getRange } from '../../core/utils';
 import { setStyles, textInput } from '../../store/actions';
 import FormulaSelection from './FormulaSelection';
 import Resizer from './Resizer';
@@ -86,6 +87,31 @@ export default class Table extends ExcelComponent {
 		this.selection.onKeydown(event);
 	}
 
+	getCells(startCell, endCell) {
+		const cells = [];
+		const colsIds = getRange(cellChords(startCell).col, cellChords(endCell).col);
+		const rowsIds = getRange(cellChords(startCell).row, cellChords(endCell).row);
+
+		rowsIds.forEach(rowId => {
+			const row = [];
+
+			colsIds.forEach(colId => {
+				const cell = this.getCell(colId, rowId);
+				row.push(cell);
+			});
+
+			cells.push(row);
+		});
+
+		return cells;
+	}
+
+	getCell(col, row) {
+		const tableRow = $(this.rowsList.children[row]);
+		const cellsList = tableRow.select('[data-table-role="cells-list"]');
+		return $(cellsList.children[col]);
+	}
+
 	scrollRows(event, scrollBarWidth) {
 		const scrollStep = 5;
 
@@ -108,12 +134,19 @@ export default class Table extends ExcelComponent {
 	}
 
 	updateStyles(styles) {
+		/* eslint-disable no-console */
 		const sel = window.getSelection();
 		if (sel.type === 'None') {
-			this.selection.selected.forEach(cell => {
+			/* this.selection.selected.forEach(cell => {
 				cell.css(styles);
 				this.dispatch(setStyles(cell.data.cellId, styles));
-			});
+			}); */
+			this.selection.selected.forEach(cells =>
+				cells.forEach(cell => {
+					cell.css(styles);
+					this.dispatch(setStyles(cell.data.cellId, styles));
+				}),
+			);
 
 			this.root.focus();
 		} else {

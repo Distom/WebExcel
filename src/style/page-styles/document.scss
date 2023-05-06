@@ -155,6 +155,7 @@
 		position: absolute;
 		border: 1px solid $border-color;
 		background: $table-grey;
+		z-index: 1;
 	}
 
 	&::before {
@@ -162,7 +163,6 @@
 		left: 0;
 		width: $info-cell-width;
 		height: var(--scrollbar-width);
-		z-index: 1;
 	}
 
 	&::after {
