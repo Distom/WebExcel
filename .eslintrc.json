@@ -46,6 +46,13 @@
       "except-parens"
     ],
     "no-use-before-define": "off",
-    "no-constructor-return": "off"
+    "no-constructor-return": "off",
+    "prefer-destructuring": [
+      "error",
+      {
+        "array": false,
+        "object": false
+      }
+    ]
   }
 }

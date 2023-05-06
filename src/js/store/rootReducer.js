@@ -2,45 +2,65 @@ import initialState from '../components/toolbar/initialState';
 import { CHANGE_TITLE, SET_STYLES, TABLE_RESIZE, TEXT_INPUT } from './types';
 
 export default function rootReducer(state, action) {
-	let stateKey;
-	let newState;
-	let newStyles;
-
 	switch (action.type) {
-		case TABLE_RESIZE:
-			stateKey = `${action.data.type}sState`;
-			newState = { ...state[stateKey], [action.data.index]: action.data.value };
+		case TABLE_RESIZE: {
+			const stateKey = `${action.data.type}sState`;
+			const newState = { ...state[stateKey], [action.data.index]: action.data.value };
 			return { ...state, [stateKey]: newState };
+		}
 
-		case TEXT_INPUT:
-			newState = {
-				...state.cellsState,
-				[action.data.id]: {
-					...state.cellsState[action.data.id],
-					data: action.data.text,
-				},
+		case TEXT_INPUT: {
+			const cellState = {
+				...state.cellsState[action.data.id],
+				data: action.data.text,
 			};
-			return { ...state, cellsState: newState };
 
-		case SET_STYLES:
-			newStyles = {
+			if (!cellState.data) delete cellState.data;
+
+			const cellsState = getNewCellsState(action.data.id, cellState, state);
+
+			return { ...state, cellsState };
+		}
+
+		case SET_STYLES: {
+			const newStyles = {
 				...state.cellsState[action.data.id]?.styles,
 				...action.data.styles,
 			};
-			newState = {
-				...state.cellsState,
-				[action.data.id]: {
-					...state.cellsState[action.data.id],
-					styles: isDefaultStyles(newStyles) ? null : newStyles,
-				},
+
+			const cellState = {
+				...state.cellsState[action.data.id],
+				styles: newStyles,
 			};
-			return { ...state, cellsState: newState };
+
+			if (isDefaultStyles(cellState.styles)) delete cellState.styles;
+
+			const cellsState = getNewCellsState(action.data.id, cellState, state);
+
+			return { ...state, cellsState };
+		}
 
 		case CHANGE_TITLE:
 			return { ...state, title: action.data.text };
 		default:
 			return state;
 	}
+}
+
+function getNewCellsState(cellId, cellState, state) {
+	let newCellsState;
+
+	if (Object.getOwnPropertyNames(cellState).length) {
+		newCellsState = {
+			...state.cellsState,
+			[cellId]: cellState,
+		};
+	} else {
+		newCellsState = { ...state.cellsState };
+		delete newCellsState[cellId];
+	}
+
+	return newCellsState;
 }
 
 function isDefaultStyles(styles) {

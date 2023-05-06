@@ -1,5 +1,6 @@
 import ExcelComponent from '../../core/ExcelComponent';
 import $ from '../../core/dom';
+import { defuseHTML } from '../../core/utils';
 import { changeTitle } from '../../store/actions';
 
 export default class Header extends ExcelComponent {
@@ -39,7 +40,9 @@ export default class Header extends ExcelComponent {
 		const { title } = this.store.getState();
 		return `
 		<div class="header-document__container">
-			<div class="header-document__input" contenteditable="true" spellcheck="false" data-type="title">${title}</div>
+			<div class="header-document__input" contenteditable="true" spellcheck="false" data-type="title">${defuseHTML(
+				title,
+			)}</div>
 			<div class="header-document__buttons">
 				<button class="header-document__button button">
 					<i class="header-document__button-icon material-icons">delete</i>

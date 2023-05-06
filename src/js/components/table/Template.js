@@ -1,7 +1,7 @@
-import { bindAll, getInlineStyles } from '../../core/utils';
+import { bindAll, defuseHTML, getInlineStyles } from '../../core/utils';
 
 export default class Template {
-	// static allowedCellTags = ['<span>', '</span>', '<br>'];
+	static allowedCellTags = ['span', 'br'];
 
 	charCodes = {
 		A: 65,
@@ -52,8 +52,9 @@ export default class Template {
 
 	getCell(colIndex, rowIndex) {
 		const id = `${colIndex}:${rowIndex}`;
-		const text = this.state.cellsState[id]?.data || '';
-		// text = text ? defuseHTML(text, Template.allowedCellTags) : '';
+
+		let text = this.state.cellsState[id]?.data || '';
+		text = text ? defuseHTML(text, Template.allowedCellTags) : '';
 
 		let styles = this.state.cellsState[id]?.styles;
 		styles = styles ? getInlineStyles(styles) : '';
@@ -61,7 +62,9 @@ export default class Template {
 		const width = this.state.colsState[colIndex];
 		const widthStyle = width ? `width: ${width}px;` : '';
 
-		return `<li class="document-table__cell" contenteditable="true" data-table="cell" data-cell-id="${id}" style="${widthStyle} ${styles}">${text}</li>`;
+		return `<li class="document-table__cell" contenteditable="true" data-table="cell" data-cell-id="${id}" data-content='${text}' style="${widthStyle} ${styles}">${this.table.mathParser.parse(
+			text,
+		)}</li>`;
 	}
 
 	getCells(rowIndex) {
@@ -82,14 +85,15 @@ export default class Template {
 	}
 
 	getRows() {
-		let rows = '<ul class="document-table__rows" data-table="rows" data-table-role="rows-list">';
+		let rows = `<div class="document-table__rows" data-table="rows">
+			<ul class="document-table__rows-list" data-table-role="rows-list">`;
 
 		rows += new Array(this.rowsCount)
 			.fill('')
 			.map((_, index) => this.getRow(index))
 			.join('');
 
-		return `${rows}</ul>`;
+		return `${rows}</ul></div>`;
 	}
 
 	getBody() {

@@ -1,6 +1,9 @@
 import ExcelComponent from '../../core/ExcelComponent';
 import $ from '../../core/dom';
+import { cellChords, getRange } from '../../core/utils';
 import { setStyles, textInput } from '../../store/actions';
+import FormulaSelection from './FormulaSelection';
+import MathParser from './MathParser';
 import Resizer from './Resizer';
 import Scroll from './Scroll';
 import Selection from './Selection';
@@ -20,7 +23,8 @@ export default class Table extends ExcelComponent {
 	}
 
 	prepare() {
-		this.template = new Template(this, 1000);
+		this.mathParser = new MathParser(this);
+		this.template = new Template(this, 30);
 	}
 
 	init() {
@@ -31,6 +35,8 @@ export default class Table extends ExcelComponent {
 		this.scroll = new Scroll(this);
 		this.resizer = new Resizer(this, 7);
 		this.selection = new Selection(this);
+		this.formulaSelection = new FormulaSelection(this);
+		this.formulaSelection.addSelectionRect();
 
 		this.on('formula:input', text => {
 			this.selection.active.text(text);
@@ -60,16 +66,19 @@ export default class Table extends ExcelComponent {
 	onPointerdown(event) {
 		this.resizer.onPointerdown(event);
 		this.selection.onPointerdown(event);
+		this.formulaSelection.onPointerdown(event);
 	}
 
 	onPointermove(event) {
 		this.resizer.onPointermove(event);
 		this.selection.onPointermove(event);
+		this.formulaSelection.onPointermove(event);
 	}
 
 	onPointerup(event) {
 		this.resizer.onPointerup(event);
 		this.selection.onPointerup(event);
+		this.formulaSelection.onPointerup(event);
 	}
 
 	onDblclick(event) {
@@ -80,13 +89,62 @@ export default class Table extends ExcelComponent {
 		this.selection.onKeydown(event);
 	}
 
+	getCells(startCell, endCell) {
+		const cells = [];
+		const colsIds = getRange(cellChords(startCell).col, cellChords(endCell).col);
+		const rowsIds = getRange(cellChords(startCell).row, cellChords(endCell).row);
+
+		rowsIds.forEach(rowId => {
+			const row = [];
+
+			colsIds.forEach(colId => {
+				const cell = this.getCell(colId, rowId);
+				row.push(cell);
+			});
+
+			cells.push(row);
+		});
+
+		return cells;
+	}
+
+	getCell(col, row) {
+		const tableRow = $(this.rowsList.children[row]);
+		const cellsList = tableRow.select('[data-table-role="cells-list"]');
+		return $(cellsList.children[col]);
+	}
+
+	scrollRows(event, scrollBarWidth) {
+		const scrollStep = 5;
+
+		const scrollBarLeft = this.root.oWidth - scrollBarWidth;
+		const scrollBarTop = this.root.oHeight + this.root.top - scrollBarWidth;
+		const scrollBarRight = this.info.oWidth;
+		const scrollBarBottom = this.root.top + this.header.oHeight;
+
+		if (event.pageX >= scrollBarLeft) {
+			this.rows.scrollBy({ left: scrollStep });
+		} else if (event.pageX <= scrollBarRight) {
+			this.rows.scrollBy({ left: -scrollStep });
+		}
+
+		if (event.pageY >= scrollBarTop) {
+			this.body.scrollBy({ top: scrollStep });
+		} else if (event.pageY <= scrollBarBottom) {
+			this.body.scrollBy({ top: -scrollStep });
+		}
+	}
+
 	updateStyles(styles) {
+		/* eslint-disable no-console */
 		const sel = window.getSelection();
 		if (sel.type === 'None') {
-			this.selection.selected.forEach(cell => {
-				cell.css(styles);
-				this.dispatch(setStyles(cell.data.cellId, styles));
-			});
+			this.selection.selected.forEach(cells =>
+				cells.forEach(cell => {
+					cell.css(styles);
+					this.dispatch(setStyles(cell.data.cellId, styles));
+				}),
+			);
 
 			this.root.focus();
 		} else {

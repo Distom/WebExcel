@@ -1,10 +1,11 @@
+import Template from './Template';
 import $ from '../../core/dom';
 import {
 	cellChords,
 	getScrollBarWidth,
-	getRange,
 	getCharKeyCodes,
 	getLastTextNode,
+	defuseHTML,
 } from '../../core/utils';
 import { textInput } from '../../store/actions';
 
@@ -30,11 +31,11 @@ export default class Selection {
 
 	#active;
 
-	#lastSelected;
+	isFormulaMode = false;
 
 	selectionActive = false;
 
-	selected = [];
+	#selected = [[]];
 
 	constructor(table) {
 		this.table = table;
@@ -49,11 +50,25 @@ export default class Selection {
 		this.active = this.table.root.select('[data-cell-id="0:0"]');
 	}
 
+	set selected(arr) {
+		if (arr[0][0]) {
+			this.table.emit('table:select', { start: arr[0][0], end: arr.at(-1).at(-1) });
+		}
+
+		this.#selected = arr;
+	}
+
+	get selected() {
+		return this.#selected;
+	}
+
 	set active(cell) {
 		if (cell.elem === this.#active?.elem) return;
 
 		if (this.#active) {
 			this.#active.delClass(Selection.activeClass);
+			this.activeObserver.disconnect();
+			this.setCellHTML(this.#active, this.table.mathParser.parse(this.#active.data.content));
 		}
 
 		this.table.emit('cell:changed', {
@@ -61,19 +76,22 @@ export default class Selection {
 			oldCell: this.#active,
 			oldCellHeight: this.#active?.oHeight,
 		});
-		this.table.emit('table:select', { start: cell });
 
 		window.getSelection().removeAllRanges();
 		this.table.root.focus();
 		this.clearSelected();
-		this.selected.push(cell);
+		this.selected = [[cell]];
 		this.lastSelected = cell;
 		this.#active = cell.addClass(Selection.activeClass);
 
+		// at first call formulaSelection is not defined
+		this.table.formulaSelection?.addSelectionRect(cell);
+
 		this.activeObserver = new MutationObserver(() => {
-			// const clearHTML = defuseHTML(cell.html(), Template.allowedCellTags);
-			const clearHTML = cell.html();
+			const clearHTML = defuseHTML(cell.html(), Template.allowedCellTags);
+			this.isFormulaMode = clearHTML.startsWith('=');
 			this.table.emit('cell:input', clearHTML);
+			cell.data.content = clearHTML;
 			this.table.dispatch(textInput(cell.data.cellId, clearHTML));
 		});
 
@@ -82,17 +100,6 @@ export default class Selection {
 
 	get active() {
 		return this.#active;
-	}
-
-	set lastSelected(cell) {
-		this.#lastSelected = cell;
-		if (!cell) return;
-
-		this.table.emit('table:select', { end: cell });
-	}
-
-	get lastSelected() {
-		return this.#lastSelected;
 	}
 
 	get cellFocused() {
@@ -109,6 +116,7 @@ export default class Selection {
 
 		if (this.cellFocused && this.active.elem === cell.elem) return;
 
+		this.table.formulaSelection.removeSelectionRect();
 		event.preventDefault();
 		event.target.setPointerCapture(event.pointerId);
 
@@ -127,38 +135,27 @@ export default class Selection {
 	onPointermove(event) {
 		if (!this.selectionActive) return;
 
+		this.table.formulaSelection.removeSelectionRect();
 		const hoveredElem = document.elementFromPoint(event.pageX, event.pageY);
+
 		if (!hoveredElem) return;
 
 		const lastSelected = $(hoveredElem).closest('[data-table="cell"]');
-		this.selectGroup(lastSelected);
 
-		this.scrollRows(event);
+		if (lastSelected && lastSelected.elem !== this.lastSelected?.elem) {
+			this.selectGroup(lastSelected);
+		}
+
+		this.table.scrollRows(event, scrollBarWidth);
 	}
 
 	onPointerup() {
+		if (this.selectionActive) this.table.formulaSelection.addSelectionRect();
 		this.selectionActive = false;
 	}
 
 	onDblclick() {
 		this.focusActiveCell();
-	}
-
-	focusActiveCell() {
-		const textNode = getLastTextNode(this.active);
-
-		if (textNode) {
-			const range = document.createRange();
-			const sel = window.getSelection();
-
-			range.setStart(textNode, textNode.nodeValue.length);
-			range.collapse(true);
-
-			sel.removeAllRanges();
-			sel.addRange(range);
-		} else {
-			this.active.focus();
-		}
 	}
 
 	onKeydown(event) {
@@ -242,18 +239,19 @@ export default class Selection {
 
 				case 'Escape':
 					event.preventDefault();
-					this.active.html('');
+					this.clearCell(this.active);
 					this.table.root.focus();
+					this.table.formulaSelection.addSelectionRect();
 					return;
 
 				// no default
 			}
 		} else {
 			if (getCharKeyCodes().includes(event.code)) {
-				this.active.html('');
+				this.clearCell(this.active);
 				this.focusActiveCell();
 				this.clearSelected();
-				this.selected.push(this.active);
+				this.selected = [[this.active]];
 				this.lastSelected = this.active;
 
 				return;
@@ -289,10 +287,12 @@ export default class Selection {
 				case 'Backspace':
 					event.preventDefault();
 
-					this.selected.forEach(cell => {
-						cell.html('');
-						this.table.dispatch(textInput(cell.data.cellId, ''));
-					});
+					this.selected.forEach(cells =>
+						cells.forEach(cell => {
+							this.clearCell(cell);
+							this.table.dispatch(textInput(cell.data.cellId, ''));
+						}),
+					);
 
 					return;
 
@@ -328,25 +328,29 @@ export default class Selection {
 		this.active = nextCell;
 	}
 
-	scrollRows(event) {
-		const scrollStep = 5;
+	focusActiveCell() {
+		this.clearSelected();
+		this.table.formulaSelection.removeSelectionRect();
+		this.setCellHTML(this.active, this.active.data.content);
 
-		const scrollBarLeft = this.table.root.oWidth - scrollBarWidth;
-		const scrollBarTop = this.table.root.oHeight + this.table.root.top - scrollBarWidth;
-		const scrollBarRight = this.table.info.oWidth;
-		const scrollBarBottom = this.table.root.top + this.table.header.oHeight;
+		const textNode = getLastTextNode(this.active);
 
-		if (event.pageX >= scrollBarLeft) {
-			this.table.rows.scrollBy({ left: scrollStep });
-		} else if (event.pageX <= scrollBarRight) {
-			this.table.rows.scrollBy({ left: -scrollStep });
+		if (textNode) {
+			const range = document.createRange();
+			const sel = window.getSelection();
+
+			range.setStart(textNode, textNode.nodeValue.length);
+			range.collapse(true);
+
+			sel.removeAllRanges();
+			sel.addRange(range);
+		} else {
+			this.active.focus();
 		}
+	}
 
-		if (event.pageY >= scrollBarTop) {
-			this.table.body.scrollBy({ top: scrollStep });
-		} else if (event.pageY <= scrollBarBottom) {
-			this.table.body.scrollBy({ top: -scrollStep });
-		}
+	setCellHTML(cell, html) {
+		cell.html(defuseHTML(html, Template.allowedCellTags));
 	}
 
 	scrollToCell(cell) {
@@ -373,35 +377,30 @@ export default class Selection {
 		}
 	}
 
-	selectGroup(lastSelected) {
+	selectGroup(lastSelected, firstSelected = this.active) {
 		if (!lastSelected) return;
-		if (this.lastSelected?.elem === lastSelected.elem) return;
 
 		this.clearSelected();
 		this.lastSelected = lastSelected;
 
-		const colsIds = getRange(cellChords(this.active).col, cellChords(lastSelected).col);
-		const rowsIds = getRange(cellChords(this.active).row, cellChords(lastSelected).row);
+		this.selected = this.table.getCells(firstSelected, lastSelected);
 
-		rowsIds.forEach(rowId => {
-			colsIds.forEach(colId => {
-				const row = $(this.table.rowsList.children[rowId]);
-				const cellsList = row.select('[data-table-role="cells-list"]');
-				const cell = $(cellsList.children[colId]);
+		this.selected.forEach(row => row.forEach(cell => cell.addClass(Selection.selectedClass)));
 
-				this.selected.push(cell);
-
-				cell.addClass(Selection.selectedClass);
-			});
-		});
-
-		if (this.selected.length === 1) this.active.delClass(Selection.selectedClass);
+		if (this.selected.length === 1 && this.selected[0].length === 1) {
+			this.active.delClass(Selection.selectedClass);
+		}
 	}
 
 	clearSelected() {
-		this.selected.forEach(cell => cell.delClass(Selection.selectedClass));
-		this.selected = [];
-		this.lastSelected = null;
+		this.selected.forEach(row => row.forEach(cell => cell.delClass(Selection.selectedClass)));
+		this.selected = [[this.active]];
+		this.lastSelected = this.active;
+	}
+
+	clearCell(cell) {
+		cell.data.content = '';
+		cell.html('');
 	}
 
 	observeSelection(mutations) {

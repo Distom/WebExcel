@@ -30,7 +30,7 @@ function updateCssPropertyScrollBarWidth() {
 function bindAll(obj) {
 	const prototype = Object.getPrototypeOf(obj);
 	Object.getOwnPropertyNames(prototype).forEach(key => {
-		if (key === 'constructor') return;
+		if (key === 'constructor' || typeof obj[key] !== 'function') return;
 		obj[key] = obj[key].bind(obj);
 	});
 }
@@ -82,10 +82,23 @@ function getCharKeyCodes() {
 	return [...getLetterKeyCodes(), ...getDigitKeyCodes(), ...getSymbolKeyCodes()];
 }
 
-function getFormatChord(cell) {
+function getLetterChord(cell) {
 	const CODE_A = 65;
 	const [col, row] = cell.data.cellId.split(':');
 	return `${String.fromCharCode(CODE_A + +col)}${+row + 1}`;
+}
+
+function converToNumberChord(chord) {
+	const CODE_A = 65;
+
+	const colLetter = chord.slice(0, 1);
+	const rowNumber = +chord.slice(1) - 1;
+
+	if (!/[A-Z]/.test(colLetter)) return false;
+
+	const colNumber = colLetter.charCodeAt() - CODE_A;
+
+	return `${colNumber}:${rowNumber}`;
 }
 
 function isEqualObjects(a, b) {
@@ -103,6 +116,10 @@ function localStore(key, value = null) {
 
 function cammelToKebab(str) {
 	return str.replace(/[A-Z]/g, match => `-${match.toLowerCase()}`);
+}
+
+function kebabToCammel(str) {
+	return str.replace(/-\w/g, match => `${match.slice(1).toUpperCase()}`);
 }
 
 function getInlineStyles(styles) {
@@ -134,9 +151,23 @@ function getLastTextNode(elem) {
 }
 
 function defuseHTML(str, allowedTags = []) {
-	return str.replace(/<.+?>/g, match =>
-		allowedTags.includes(match) ? match : `&lt;${match.slice(1, -1)}&gt;`,
-	);
+	return str.replace(/<.+?>/g, match => {
+		const tagName = match.replace(/<|>|\//g, '').split(' ')[0];
+		return allowedTags.includes(tagName) ? match : `&lt;${match.slice(1, -1)}&gt;`;
+	});
+}
+
+function parseStyles(stylesStr) {
+	const styles = {};
+
+	stylesStr.split(';').forEach(style => {
+		const [prop, value] = style.split(':');
+		if (!prop) return;
+
+		styles[kebabToCammel(prop.trim())] = value.trim();
+	});
+
+	return styles;
 }
 
 export {
@@ -151,11 +182,14 @@ export {
 	getDigitKeyCodes,
 	getSymbolKeyCodes,
 	getCharKeyCodes,
-	getFormatChord,
+	getLetterChord,
 	isEqualObjects,
 	localStore,
 	getInlineStyles,
 	cammelToKebab,
 	getLastTextNode,
 	defuseHTML,
+	parseStyles,
+	kebabToCammel,
+	converToNumberChord,
 };
