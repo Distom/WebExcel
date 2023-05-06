@@ -1,4 +1,3 @@
-import mathParser from '../../core/mathParser';
 import { bindAll, defuseHTML, getInlineStyles } from '../../core/utils';
 
 export default class Template {
@@ -63,7 +62,7 @@ export default class Template {
 		const width = this.state.colsState[colIndex];
 		const widthStyle = width ? `width: ${width}px;` : '';
 
-		return `<li class="document-table__cell" contenteditable="true" data-table="cell" data-cell-id="${id}" data-content='${text}' style="${widthStyle} ${styles}">${mathParser(
+		return `<li class="document-table__cell" contenteditable="true" data-table="cell" data-cell-id="${id}" data-content='${text}' style="${widthStyle} ${styles}">${this.table.mathParser.parse(
 			text,
 		)}</li>`;
 	}
@@ -96,17 +95,6 @@ export default class Template {
 
 		return `${rows}</ul></div>`;
 	}
-
-	/* getRows() {
-		let rows = '<ul class="document-table__rows" data-table="rows" data-table-role="rows-list">';
-
-		rows += new Array(this.rowsCount)
-			.fill('')
-			.map((_, index) => this.getRow(index))
-			.join('');
-
-		return `${rows}</ul>`;
-	} */
 
 	getBody() {
 		let body = '<div class="document-table__body" data-table="body">';

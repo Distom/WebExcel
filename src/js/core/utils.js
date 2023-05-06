@@ -82,10 +82,23 @@ function getCharKeyCodes() {
 	return [...getLetterKeyCodes(), ...getDigitKeyCodes(), ...getSymbolKeyCodes()];
 }
 
-function getFormatChord(cell) {
+function getLetterChord(cell) {
 	const CODE_A = 65;
 	const [col, row] = cell.data.cellId.split(':');
 	return `${String.fromCharCode(CODE_A + +col)}${+row + 1}`;
+}
+
+function converToNumberChord(chord) {
+	const CODE_A = 65;
+
+	const colLetter = chord.slice(0, 1);
+	const rowNumber = +chord.slice(1) - 1;
+
+	if (!/[A-Z]/.test(colLetter)) return false;
+
+	const colNumber = colLetter.charCodeAt() - CODE_A;
+
+	return `${colNumber}:${rowNumber}`;
 }
 
 function isEqualObjects(a, b) {
@@ -169,7 +182,7 @@ export {
 	getDigitKeyCodes,
 	getSymbolKeyCodes,
 	getCharKeyCodes,
-	getFormatChord,
+	getLetterChord,
 	isEqualObjects,
 	localStore,
 	getInlineStyles,
@@ -178,4 +191,5 @@ export {
 	defuseHTML,
 	parseStyles,
 	kebabToCammel,
+	converToNumberChord,
 };

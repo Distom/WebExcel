@@ -3,6 +3,7 @@ import $ from '../../core/dom';
 import { cellChords, getRange } from '../../core/utils';
 import { setStyles, textInput } from '../../store/actions';
 import FormulaSelection from './FormulaSelection';
+import MathParser from './MathParser';
 import Resizer from './Resizer';
 import Scroll from './Scroll';
 import Selection from './Selection';
@@ -22,6 +23,7 @@ export default class Table extends ExcelComponent {
 	}
 
 	prepare() {
+		this.mathParser = new MathParser(this);
 		this.template = new Template(this, 30);
 	}
 
@@ -137,10 +139,6 @@ export default class Table extends ExcelComponent {
 		/* eslint-disable no-console */
 		const sel = window.getSelection();
 		if (sel.type === 'None') {
-			/* this.selection.selected.forEach(cell => {
-				cell.css(styles);
-				this.dispatch(setStyles(cell.data.cellId, styles));
-			}); */
 			this.selection.selected.forEach(cells =>
 				cells.forEach(cell => {
 					cell.css(styles);

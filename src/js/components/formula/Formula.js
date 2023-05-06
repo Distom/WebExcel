@@ -1,5 +1,5 @@
 import ExcelComponent from '../../core/ExcelComponent';
-import { bindAll, getFormatChord } from '../../core/utils';
+import { bindAll, getLetterChord } from '../../core/utils';
 
 export default class Formula extends ExcelComponent {
 	static className = 'main-document__formula document-formula';
@@ -42,8 +42,8 @@ export default class Formula extends ExcelComponent {
 	}
 
 	updateChords({ start, end }) {
-		this.startChord.text(getFormatChord(start));
-		this.endChord.text(getFormatChord(end));
+		this.startChord.text(getLetterChord(start));
+		this.endChord.text(getLetterChord(end));
 
 		if (start.elem === end.elem) {
 			this.endChord.elem.hidden = true;

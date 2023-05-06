@@ -1,6 +1,5 @@
 import Template from './Template';
 import $ from '../../core/dom';
-import mathParser from '../../core/mathParser';
 import {
 	cellChords,
 	getScrollBarWidth,
@@ -69,7 +68,7 @@ export default class Selection {
 		if (this.#active) {
 			this.#active.delClass(Selection.activeClass);
 			this.activeObserver.disconnect();
-			this.setCellHTML(this.#active, mathParser(this.#active.data.content));
+			this.setCellHTML(this.#active, this.table.mathParser.parse(this.#active.data.content));
 		}
 
 		this.table.emit('cell:changed', {
