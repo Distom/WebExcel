@@ -105,7 +105,7 @@ function isEqualObjects(a, b) {
 	return JSON.stringify(a) === JSON.stringify(b);
 }
 
-function localStore(key, value = null) {
+function localStorageObj(key, value = null) {
 	if (!value) {
 		return JSON.parse(localStorage.getItem(key));
 	}
@@ -184,7 +184,7 @@ export {
 	getCharKeyCodes,
 	getLetterChord,
 	isEqualObjects,
-	localStore,
+	localStorageObj,
 	getInlineStyles,
 	cammelToKebab,
 	getLastTextNode,

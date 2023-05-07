@@ -3,7 +3,7 @@ import StoreSubscriber from '../../core/StoreSubsriber';
 import $ from '../../core/dom';
 
 export default class Excel {
-	static className = 'document__excel';
+	static className = 'document';
 
 	static mainElemClassName = 'document__main main-document';
 
@@ -41,8 +41,7 @@ export default class Excel {
 		return root;
 	}
 
-	render() {
-		this.container.append(this.getRoot());
+	init() {
 		this.storeSubscriber.subscribeComponents(this.components);
 		this.components.forEach(component => component.init());
 	}

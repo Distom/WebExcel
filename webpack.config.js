@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const postcssPresetEnv = require('postcss-preset-env');
@@ -21,6 +22,16 @@ function getPlugins() {
 
 	if (devMode) plugins.push(new EslintWebpackPlugin());
 
+	if (fs.existsSync(path.resolve(__dirname, 'src', '404.html'))) {
+		plugins.push(
+			new HtmlWebpackPlugin({
+				template: path.resolve(__dirname, 'src', '404.html'),
+				filename: '404.html',
+				inject: false,
+			}),
+		);
+	}
+
 	return plugins;
 }
 
@@ -34,6 +45,11 @@ module.exports = {
 		filename: 'bundle.[contenthash].js',
 		clean: true,
 		assetModuleFilename: 'assets/[name][ext]',
+	},
+	devServer: {
+		historyApiFallback: {
+			index: '/404.html',
+		},
 	},
 	optimization: {
 		splitChunks: {
