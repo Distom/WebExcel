@@ -36,13 +36,13 @@ export default class Router {
 		}
 
 		window.addEventListener('popstate', this.handleLocation);
-		document.addEventListener('click', this.route);
+		document.addEventListener('click', this.onClick);
 	}
 
 	destroy() {
 		window.removeEventListener('load', this.onLoad);
 		window.removeEventListener('popstate', this.handleLocation);
-		document.removeEventListener('click', this.route);
+		document.removeEventListener('click', this.onClick);
 	}
 
 	onLoad() {
@@ -56,13 +56,16 @@ export default class Router {
 		this.handleLocation();
 	}
 
-	route(event) {
+	onClick(event) {
 		const link = event.target.closest('a');
 		if (!link) return;
 
 		event.preventDefault();
-		window.history.pushState({}, '', `${this.repository}${link.getAttribute('href')}`);
+		this.route(link.getAttribute('href'));
+	}
 
+	route(path) {
+		window.history.pushState({}, '', `${this.repository}${path}`);
 		this.handleLocation();
 	}
 

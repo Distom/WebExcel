@@ -170,6 +170,14 @@ function parseStyles(stylesStr) {
 	return styles;
 }
 
+function cloneObj(obj) {
+	return JSON.parse(JSON.stringify(obj));
+}
+
+function formatDate(number) {
+	return number < 10 ? `0${number}` : number;
+}
+
 export {
 	capitalize,
 	getScrollBarWidth,
@@ -192,4 +200,6 @@ export {
 	parseStyles,
 	kebabToCammel,
 	converToNumberChord,
+	cloneObj,
+	formatDate,
 };

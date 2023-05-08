@@ -1,8 +1,42 @@
 import Page from '../js/core/Page';
 import $ from '../js/core/dom';
+import { formatDate, localStorageObj } from '../js/core/utils';
 
 export default class DashboardPage extends Page {
+	getDocumentsHTML() {
+		let documentsHTML = '';
+
+		for (let i = 0; i < localStorage.length; i += 1) {
+			const key = localStorage.key(i);
+
+			if (key.startsWith('excelDocument:')) {
+				documentsHTML += this.getDocumentHTML(key);
+			}
+		}
+
+		return documentsHTML;
+	}
+
+	getDocumentHTML(excelDocumentKey) {
+		const id = excelDocumentKey.split(':')[1];
+		const state = localStorageObj(excelDocumentKey);
+		const date = new Date(+state.lastOpenedTimestamp);
+
+		const day = formatDate(date.getDate());
+		const month = formatDate(date.getMonth() + 1);
+		const year = date.getFullYear();
+
+		return `
+		<li class="home-documents-section__document">
+			<a href="/excel#${id}" class="home-documents-section__document-link">
+				<div class="home-documents-section__document-title">${state.title}</div>
+				<time class="home-documents-section__document-date" datetime="${year}-${month}-${day}">${day}.${month}.${year}</time>
+			</a>
+		</li>`;
+	}
+
 	getRoot() {
+		const id = Date.now().toString();
 		const root = $.create('div', 'home').html(`
 		<header class="home__header header-home">
 			<div class="header-home__container">
@@ -12,28 +46,17 @@ export default class DashboardPage extends Page {
 		<main class="home__main main-home">
 			<section class="main-home__buttons-section home-buttons-section">
 				<div class="home-buttons-section__container">
-					<a href="/excel" class="home-buttons-section__button">+</a>
+					<a href="/excel#${id}" class="home-buttons-section__button">+</a>
 				</div>
 			</section>
 			<section class="main-home__documents-section home-documents-section">
 				<div class="home-documents-section__container">
 					<header class="home-documents-section__header">
 						<div class="home-documents-section__title">Title</div>
-						<div class="home-documents-section__date">Last opening date</div>
+						<div class="home-documents-section__date">Last opened</div>
 					</header>
 					<ul class="home-documents-section__documents">
-						<li class="home-documents-section__document">
-							<a href="/excel#228" class="home-documents-section__document-link">
-								<div class="home-documents-section__document-title">My table</div>
-								<time class="home-documents-section__document-date" datetime="2023-03-24">24.03.2023</time>
-							</a>
-						</li>
-						<li class="home-documents-section__document">
-							<a href="/fsdlhfsladfh" class="home-documents-section__document-link">
-								<div class="home-documents-section__document-title">My second table</div>
-								<time class="home-documents-section__document-date" datetime="2023-01-04">04.01.2023</time>
-							</a>
-						</li>
+						${this.getDocumentsHTML()}
 					</ul>
 				</div>
 			</section>

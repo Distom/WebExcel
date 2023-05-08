@@ -1,6 +1,7 @@
 import Emitter from '../../core/Emitter';
 import StoreSubscriber from '../../core/StoreSubsriber';
 import $ from '../../core/dom';
+import { updateLastOpenedDate } from '../../store/actions';
 
 export default class Excel {
 	static className = 'document';
@@ -42,6 +43,7 @@ export default class Excel {
 	}
 
 	init() {
+		this.store.dispatch(updateLastOpenedDate());
 		this.storeSubscriber.subscribeComponents(this.components);
 		this.components.forEach(component => component.init());
 	}

@@ -5,13 +5,13 @@
 	max-height: 100vh;
 
 	&__header {
-		height: 34px;
+		height: 40px;
 		padding: 8px 0;
 		background: $light-blue;
 	}
 
 	&__main {
-		max-height: calc(100vh - 34px);
+		max-height: calc(100vh - 40px);
 		display: flex;
 		flex-direction: column;
 	}
@@ -75,7 +75,7 @@
 		display: flex;
 		align-items: center;
 		flex-wrap: wrap;
-		height: 34px;
+		height: 40px;
 		background-color: $blue;
 		width: calc(100% - 30px);
 		border-radius: 20px;
