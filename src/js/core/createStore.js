@@ -1,3 +1,5 @@
+import { cloneObj } from './utils';
+
 export default function createStore(rootReducer, initialState = {}) {
 	let state = rootReducer({ ...initialState }, { type: '__INIT__' });
 	let subscribers = [];
@@ -16,7 +18,7 @@ export default function createStore(rootReducer, initialState = {}) {
 		},
 
 		getState() {
-			return JSON.parse(JSON.stringify(state));
+			return cloneObj(state);
 		},
 	};
 }

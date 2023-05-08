@@ -1,5 +1,11 @@
 import initialState from '../components/toolbar/initialState';
-import { CHANGE_TITLE, SET_STYLES, TABLE_RESIZE, TEXT_INPUT } from './types';
+import {
+	CHANGE_TITLE,
+	SET_STYLES,
+	TABLE_RESIZE,
+	TEXT_INPUT,
+	UPDATE_LAST_OPENED_TIMESTAMP,
+} from './types';
 
 export default function rootReducer(state, action) {
 	switch (action.type) {
@@ -42,6 +48,9 @@ export default function rootReducer(state, action) {
 
 		case CHANGE_TITLE:
 			return { ...state, title: action.data.text };
+
+		case UPDATE_LAST_OPENED_TIMESTAMP:
+			return { ...state, lastOpenedTimestamp: action.data.date };
 		default:
 			return state;
 	}

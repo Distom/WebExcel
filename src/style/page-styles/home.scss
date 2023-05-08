@@ -67,17 +67,21 @@
 		margin-bottom: 10px;
 	}
 
-	&__title {}
-
-	&__date {}
-
-	&__documents {
-		display: flex;
-		flex-direction: column;
-		gap: 5px;
+	&__title {
+		padding-left: 60px;
 	}
 
-	&__document {}
+	&__date {
+		padding-right: 15px;
+	}
+
+	&__documents {}
+
+	&__document {
+		&:last-child .home-documents-section__document-link::after {
+			display: none;
+		}
+	}
 
 	&__document-link {
 		height: 44px;
@@ -85,16 +89,46 @@
 		display: flex;
 		justify-content: space-between;
 		border-radius: 20px;
-		padding: 0 15px;
-		margin: 0 -15px;
+		padding: 0 30px;
 		color: inherit;
+		position: relative;
+		padding-left: 60px;
+
+		&::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: 30px;
+			width: 20px;
+			height: 20px;
+			transform: translate(-50%, -50%);
+			background: url('./favicon.ico') 0 0 no-repeat;
+			background-size: cover;
+		}
+
+		&::after {
+			content: '';
+			position: absolute;
+			bottom: -1px;
+			left: 50px;
+			width: calc(100% - 67px);
+			height: 1px;
+			background: $border-color;
+			pointer-events: none;
+		}
 
 		&:hover {
 			background: #e6f4ea;
+
+			&::after {
+				display: none;
+			}
 		}
 	}
 
 	&__document-title {}
 
-	&__document-date {}
+	&__document-date {
+		color: gray;
+	}
 }

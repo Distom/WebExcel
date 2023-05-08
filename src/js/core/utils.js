@@ -105,7 +105,7 @@ function isEqualObjects(a, b) {
 	return JSON.stringify(a) === JSON.stringify(b);
 }
 
-function localStore(key, value = null) {
+function localStorageObj(key, value = null) {
 	if (!value) {
 		return JSON.parse(localStorage.getItem(key));
 	}
@@ -170,6 +170,10 @@ function parseStyles(stylesStr) {
 	return styles;
 }
 
+function cloneObj(obj) {
+	return JSON.parse(JSON.stringify(obj));
+}
+
 export {
 	capitalize,
 	getScrollBarWidth,
@@ -184,7 +188,7 @@ export {
 	getCharKeyCodes,
 	getLetterChord,
 	isEqualObjects,
-	localStore,
+	localStorageObj,
 	getInlineStyles,
 	cammelToKebab,
 	getLastTextNode,
@@ -192,4 +196,5 @@ export {
 	parseStyles,
 	kebabToCammel,
 	converToNumberChord,
+	cloneObj,
 };

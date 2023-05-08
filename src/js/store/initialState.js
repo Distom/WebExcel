@@ -1,4 +1,4 @@
-import { localStore } from '../core/utils';
+import { cloneObj } from '../core/utils';
 
 const defaultState = {
 	title: 'New table',
@@ -7,7 +7,9 @@ const defaultState = {
 	cellsState: {},
 };
 
-export default localStore('excelState') ?? defaultState;
+export default function initialState(state) {
+	return state || cloneObj(defaultState);
+}
 
 // в 6 и 7 примерах не работает выделение. Если якорь или фокус находится не в текстовой ноде в между br, то в селекшн попадает родительский элемент для br. Этот вариант в коде нужно дописать. Нужно обратотать варианты когда br находится в спане или вне спана или один в спане второй вне и тд.
 
