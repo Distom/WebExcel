@@ -1,6 +1,6 @@
 import Page from '../js/core/Page';
 import $ from '../js/core/dom';
-import { formatDate, localStorageObj } from '../js/core/utils';
+import { localStorageObj } from '../js/core/utils';
 
 export default class DashboardPage extends Page {
 	getDocumentsHTML() {
@@ -22,15 +22,25 @@ export default class DashboardPage extends Page {
 		const state = localStorageObj(excelDocumentKey);
 		const date = new Date(+state.lastOpenedTimestamp);
 
-		const day = formatDate(date.getDate());
-		const month = formatDate(date.getMonth() + 1);
+		const day = date.getDate();
+		const month = date.getMonth();
 		const year = date.getFullYear();
+		const now = new Date();
+
+		const locale = window.navigator.language || window.navigator.userLanguage;
+
+		const dateStr =
+			now.getDate() === day && now.getMonth() === month && now.getFullYear() === year
+				? date.toLocaleTimeString(locale, { hour: 'numeric', minute: 'numeric' })
+				: date.toLocaleDateString(locale, { year: 'numeric', day: 'numeric', month: 'short' });
 
 		return `
 		<li class="home-documents-section__document">
 			<a href="/excel#${id}" class="home-documents-section__document-link">
 				<div class="home-documents-section__document-title">${state.title}</div>
-				<time class="home-documents-section__document-date" datetime="${year}-${month}-${day}">${day}.${month}.${year}</time>
+				<time class="home-documents-section__document-date" datetime="${year}-${
+			month + 1
+		}-${day}">${dateStr}</time>
 			</a>
 		</li>`;
 	}

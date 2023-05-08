@@ -6,7 +6,8 @@
   "scripts": {
     "start": "webpack serve",
     "build-dev": "webpack",
-    "build-prod": "webpack --node-env=production"
+    "build-prod": "webpack --node-env=production",
+    "lint": "eslint ./src"
   },
   "keywords": [],
   "author": "Dmitro Stekhov",

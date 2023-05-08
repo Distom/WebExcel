@@ -2,9 +2,13 @@ import $ from '../dom';
 import { bindAll } from '../utils';
 
 export default class Router {
+	static instance = null;
+
 	page = null;
 
 	constructor(selector, routes = {}) {
+		if (Router.instance) return Router.instance;
+
 		if (!selector) {
 			throw new Error('Router selector is not provided');
 		}
@@ -16,6 +20,7 @@ export default class Router {
 
 		bindAll(this);
 		this.init();
+		Router.instance = this;
 	}
 
 	get currentHash() {
