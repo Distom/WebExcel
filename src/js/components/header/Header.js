@@ -1,5 +1,5 @@
 import ExcelComponent from '../../core/ExcelComponent';
-import Storage from '../../core/Storage';
+import Storage from '../../data/Storage';
 import $ from '../../core/dom';
 import Router from '../../core/routes/Router';
 import { defuseHTML } from '../../core/utils';

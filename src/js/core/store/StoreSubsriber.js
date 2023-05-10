@@ -1,4 +1,4 @@
-import { isEqualObjects } from './utils';
+import { isEqualObjects } from '../utils';
 
 export default class StoreSubscriber {
 	prevState = {};
