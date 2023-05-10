@@ -7,7 +7,7 @@ export default function createStore(rootReducer, initialState = {}) {
 	return {
 		dispatch(action) {
 			state = rootReducer(state, action);
-			subscribers.forEach(sub => sub(state));
+			subscribers.forEach(sub => sub(cloneObj(state)));
 		},
 
 		subscribe(fn) {
