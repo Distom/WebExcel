@@ -3,11 +3,15 @@
   "version": "1.0.0",
   "description": "first webpack bundle",
   "private": true,
+  "jest": {
+    "testEnvironment": "jsdom"
+  },
   "scripts": {
     "start": "webpack serve",
     "build-dev": "webpack",
     "build-prod": "webpack --node-env=production",
-    "lint": "eslint ./src"
+    "lint": "eslint ./src",
+    "test": "jest"
   },
   "keywords": [],
   "author": "Dmitro Stekhov",
@@ -16,17 +20,21 @@
     "@babel/core": "^7.21.0",
     "@babel/eslint-parser": "^7.21.3",
     "@babel/preset-env": "^7.20.2",
+    "@types/jest": "^29.5.1",
     "babel-loader": "^9.1.2",
     "css-loader": "^6.7.3",
     "eslint": "^8.2.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-jest": "^27.2.1",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-webpack-plugin": "^4.0.1",
     "html-loader": "^4.2.0",
     "html-webpack-plugin": "^5.5.0",
     "image-webpack-loader": "^8.1.0",
+    "jest": "^29.5.0",
+    "jest-environment-jsdom": "^29.5.0",
     "mini-css-extract-plugin": "^2.7.3",
     "postcss": "^8.4.21",
     "postcss-loader": "^7.0.2",

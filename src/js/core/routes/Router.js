@@ -41,13 +41,13 @@ export default class Router {
 		}
 
 		window.addEventListener('popstate', this.handleLocation);
-		document.addEventListener('click', this.onClick);
+		this.container.on('click', this.onClick);
 	}
 
 	destroy() {
 		window.removeEventListener('load', this.onLoad);
 		window.removeEventListener('popstate', this.handleLocation);
-		document.removeEventListener('click', this.onClick);
+		this.container.off('click', this.onClick);
 	}
 
 	onLoad() {
