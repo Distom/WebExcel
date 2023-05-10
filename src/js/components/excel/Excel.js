@@ -1,5 +1,5 @@
 import Emitter from '../../core/Emitter';
-import StoreSubscriber from '../../core/StoreSubsriber';
+import StoreSubscriber from '../../core/store/StoreSubsriber';
 import $ from '../../core/dom';
 import { updateLastOpenedDate } from '../../store/actions';
 

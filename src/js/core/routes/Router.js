@@ -8,6 +8,7 @@ export default class Router {
 
 	constructor(selector, routes = {}) {
 		if (Router.instance) return Router.instance;
+		Router.instance = this;
 
 		if (!selector) {
 			throw new Error('Router selector is not provided');
@@ -20,7 +21,6 @@ export default class Router {
 
 		bindAll(this);
 		this.init();
-		Router.instance = this;
 	}
 
 	get currentHash() {
@@ -84,7 +84,7 @@ export default class Router {
 			window.history.pushState({}, '', '/');
 		}
 
-		this.page = new Page(this.currentHash);
+		this.page = new Page();
 		this.container.append(this.page.getRoot());
 		this.page.afterRender();
 	}

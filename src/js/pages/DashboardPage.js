@@ -1,6 +1,6 @@
-import Page from '../js/core/Page';
-import $ from '../js/core/dom';
-import { localStorageObj } from '../js/core/utils';
+import Page from '../core/Page';
+import $ from '../core/dom';
+import { localStorageObj } from '../core/utils';
 
 export default class DashboardPage extends Page {
 	getDocumentsHTML() {
