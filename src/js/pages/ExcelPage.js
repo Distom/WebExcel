@@ -4,7 +4,7 @@ import Header from '../components/header/Header';
 import Table from '../components/table/Table';
 import Toolbar from '../components/toolbar/Toolbar';
 import Page from '../core/Page';
-import Storage from '../core/Storage';
+import Storage from '../data/Storage';
 import Router from '../core/routes/Router';
 import createStore from '../core/store/createStore';
 import { isEqualObjects, localStorageObj } from '../core/utils';
@@ -14,7 +14,7 @@ import rootReducer from '../store/rootReducer';
 export default class ExcelPage extends Page {
 	getRoot() {
 		this.documentId = new Router().currentHash;
-		this.storageKey = Storage.getDocumentStorageKey(this.documentId);
+		this.storageKey = Storage.getDocumentKey(this.documentId);
 		const state = initialState(localStorageObj(this.storageKey));
 		this.store = createStore(rootReducer, state);
 
