@@ -24,7 +24,7 @@ export default class Table extends ExcelComponent {
 
 	prepare() {
 		this.mathParser = new MathParser(this);
-		this.template = new Template(this, 1000);
+		this.template = new Template(this, 100);
 	}
 
 	init() {
