@@ -13,7 +13,14 @@ import rootReducer from '../store/rootReducer';
 
 export default class ExcelPage extends Page {
 	getRoot() {
-		this.documentId = new Router().currentHash;
+		let documentId = new Router().currentHash;
+
+		if (!documentId) {
+			documentId = Date.now().toString();
+			window.location.hash = documentId;
+		}
+
+		this.documentId = documentId;
 		this.storageKey = Storage.getDocumentKey(this.documentId);
 		const state = initialState(localStorageObj(this.storageKey));
 		this.store = createStore(rootReducer, state);

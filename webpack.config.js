@@ -20,16 +20,18 @@ function getPlugins() {
 		}),
 	];
 
-	if (devMode) plugins.push(new EslintWebpackPlugin());
+	if (devMode) {
+		plugins.push(new EslintWebpackPlugin());
 
-	if (fs.existsSync(path.resolve(__dirname, 'src', '404.html'))) {
-		plugins.push(
-			new HtmlWebpackPlugin({
-				template: path.resolve(__dirname, 'src', '404.html'),
-				filename: '404.html',
-				inject: false,
-			}),
-		);
+		if (fs.existsSync(path.resolve(__dirname, '404.html'))) {
+			plugins.push(
+				new HtmlWebpackPlugin({
+					template: path.resolve(__dirname, '404.html'),
+					filename: '404.html',
+					inject: false,
+				}),
+			);
+		}
 	}
 
 	return plugins;
