@@ -17,7 +17,7 @@ export default class Router {
 		this.container = $(selector);
 		this.routes = routes;
 		this.repositoryRegEx = /.+(?=\/)/;
-		this.repository = window.location.pathname.match(this.repositoryRegEx) || '';
+		this.repositoryPath = window.location.pathname.match(this.repositoryRegEx) || '';
 
 		bindAll(this);
 		this.init();
@@ -70,7 +70,7 @@ export default class Router {
 	}
 
 	route(path) {
-		window.history.pushState({}, '', `${this.repository}${path}`);
+		window.history.pushState({}, '', `${this.repositoryPath}${path}`);
 		this.handleLocation();
 	}
 

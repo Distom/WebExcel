@@ -11,10 +11,10 @@
 <body>
 	<script>
 		localStorage.setItem('originalRoute', `${location.pathname}${location.hash}`);
-		let serverPathReg = new RegExp('.+(?=/)');
-		let serverPath = location.pathname.match(serverPathReg) || '';
+		let repositoryRegEx = new RegExp('.+(?=/)');
+		let repositoryPath = location.pathname.match(repositoryRegEx) || '';
 
-		location.replace(serverPath + '/');
+		location.replace(repositoryPath + '/');
 	</script>
 </body>
 
