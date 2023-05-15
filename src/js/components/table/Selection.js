@@ -1,12 +1,6 @@
 import Template from './Template';
 import $ from '../../core/dom';
-import {
-	cellChords,
-	getScrollBarWidth,
-	getCharKeyCodes,
-	getLastTextNode,
-	defuseHTML,
-} from '../../core/utils';
+import { cellChords, getScrollBarWidth, getLastTextNode, defuseHTML } from '../../core/utils';
 import { textInput } from '../../store/actions';
 
 let scrollBarWidth = getScrollBarWidth();
@@ -26,7 +20,6 @@ export default class Selection {
 		'Delete',
 		'Escape',
 		'Backspace',
-		...getCharKeyCodes(),
 	];
 
 	#active;
@@ -158,6 +151,16 @@ export default class Selection {
 		this.focusActiveCell();
 	}
 
+	onKeypress() {
+		if (this.cellFocused) return;
+
+		this.clearCell(this.active);
+		this.focusActiveCell();
+		this.clearSelected();
+		this.selected = [[this.active]];
+		this.lastSelected = this.active;
+	}
+
 	onKeydown(event) {
 		if (!Selection.navigationKeys.includes(event.code)) return;
 
@@ -247,16 +250,6 @@ export default class Selection {
 				// no default
 			}
 		} else {
-			if (getCharKeyCodes().includes(event.code)) {
-				this.clearCell(this.active);
-				this.focusActiveCell();
-				this.clearSelected();
-				this.selected = [[this.active]];
-				this.lastSelected = this.active;
-
-				return;
-			}
-
 			switch (event.code) {
 				case 'ArrowUp':
 					event.preventDefault();

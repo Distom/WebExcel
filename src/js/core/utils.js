@@ -48,40 +48,6 @@ function getRange(a, b) {
 	return new Array(max - min + 1).fill('').map((_, index) => min + index);
 }
 
-function getLetterKeyCodes() {
-	const CODE_A = 65;
-
-	return new Array(26).fill('').map((_, index) => `Key${String.fromCharCode(CODE_A + index)}`);
-}
-
-function getDigitKeyCodes() {
-	return new Array(10).fill('').map((_, index) => `Digit${index}`);
-}
-
-function getSymbolKeyCodes() {
-	return [
-		'Backquote',
-		'Minus',
-		'Equal',
-		'Backslash',
-		'BracketLeft',
-		'BracketRight',
-		'Semicolon',
-		'Quote',
-		'Slash',
-		'Period',
-		'Comma',
-		'NumpadDivide',
-		'NumpadMultiply',
-		'NumpadSubtract',
-		'NumpadAdd',
-	];
-}
-
-function getCharKeyCodes() {
-	return [...getLetterKeyCodes(), ...getDigitKeyCodes(), ...getSymbolKeyCodes()];
-}
-
 function getLetterChord(cell) {
 	const CODE_A = 65;
 	const [col, row] = cell.data.cellId.split(':');
@@ -182,10 +148,6 @@ export {
 	bindAll,
 	cellChords,
 	getRange,
-	getLetterKeyCodes,
-	getDigitKeyCodes,
-	getSymbolKeyCodes,
-	getCharKeyCodes,
 	getLetterChord,
 	isEqualObjects,
 	localStorageObj,

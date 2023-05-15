@@ -17,7 +17,7 @@ export default class Table extends ExcelComponent {
 	constructor(root, options = {}) {
 		super(root, {
 			name: 'Table',
-			listeners: ['pointerdown', 'pointerup', 'pointermove', 'dblclick', 'keydown'],
+			listeners: ['pointerdown', 'pointerup', 'pointermove', 'dblclick', 'keydown', 'keypress'],
 			...options,
 		});
 	}
@@ -87,6 +87,10 @@ export default class Table extends ExcelComponent {
 
 	onKeydown(event) {
 		this.selection.onKeydown(event);
+	}
+
+	onKeypress(event) {
+		this.selection.onKeypress(event);
 	}
 
 	getCells(startCell, endCell) {

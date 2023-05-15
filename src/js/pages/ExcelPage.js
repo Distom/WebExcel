@@ -4,7 +4,7 @@ import Header from '../components/header/Header';
 import Table from '../components/table/Table';
 import Toolbar from '../components/toolbar/Toolbar';
 import Page from '../core/Page';
-import Storage from '../data/Storage';
+import Storage from '../services/Storage';
 import Router from '../core/routes/Router';
 import createStore from '../core/store/createStore';
 import { isEqualObjects, localStorageObj } from '../core/utils';
